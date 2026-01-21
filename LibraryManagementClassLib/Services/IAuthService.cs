@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Services
 {
-    public interface IAuthenticationService
+    public interface IAuthService
     {
-
-        User Register(UserDto request);
+        Task<User?> RegisterAsync(UserDto request);
+        Task<string?> LoginAsync(LoginDto request);
     }
 }
