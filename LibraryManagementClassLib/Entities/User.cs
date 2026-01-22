@@ -28,6 +28,8 @@ namespace LibraryManagementClassLib.Entities
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string Email { get; set; }
 
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
         public Role Role { get; set; }
         public string PasswordHash { get; set; }
         public DateTime CreatedAt { get; set; }

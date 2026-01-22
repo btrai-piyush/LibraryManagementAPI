@@ -16,10 +16,10 @@ namespace LibraryManagementAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthenticationController : ControllerBase
+public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-    public AuthenticationController(IAuthService authService)
+    public AuthController(IAuthService authService)
     {
         _authService = authService;
     }
@@ -37,14 +37,25 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<string>> Login(LoginDto request)
+    public async Task<ActionResult<TokenResponseDto>> Login(LoginDto request)
     {
-        var token = await _authService.LoginAsync(request);
-        if (token == null)
+        var result = await _authService.LoginAsync(request);
+        if (result == null)
         {
             return BadRequest("Invalid credentials");
         }
 
-        return Ok(token);
+        return Ok(result);
+    }
+
+    [HttpPost("refresh-tokens")]
+    public async Task<ActionResult<TokenResponseDto>> RefreshToken(RefreshTokenRequestDto request)
+    {
+        var results = await _authService.RefreshTokensAsync(request);
+        if (results is null || results.AccessToken is null || request.RefreshToken is null)
+        {
+            return Unauthorized("Invalid refresh token");
+        }
+        return Ok(results);
     }
 }

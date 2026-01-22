@@ -1,4 +1,6 @@
 using LibraryManagementClassLib.Data;
+using LibraryManagementClassLib.Services;
+using LibraryManagementClassLib.Implementation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -13,7 +15,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<LibraryManagementAPIDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-builder.Services.AddScoped<LibraryManagementClassLib.Services.IAuthService, LibraryManagementClassLib.Implementation.AuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
