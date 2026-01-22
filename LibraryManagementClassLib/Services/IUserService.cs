@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Services
 {
-    public interface IAuthService
+    public interface IUserService
     {
-        Task<User?> RegisterAsync(UserDto request);
-        Task<TokenResponseDto?> LoginAsync(LoginDto request);
-        Task<TokenResponseDto?> RefreshTokensAsync(RefreshTokenRequestDto request);
+        Task<List<UserResponseDto>> GetAllUsersAsync();
+        Task<UserResponseDto> GetUserByIdAsync(int userId);
+        Task<bool> DeleteAsync(int userId);
     }
 }
