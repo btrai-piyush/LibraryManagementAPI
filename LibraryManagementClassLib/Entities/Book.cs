@@ -14,13 +14,11 @@ namespace LibraryManagementClassLib.Entities
         public string ISBN { get; set; }
         public int TotalCopies { get; set; }
         public int AvailableCopies { get; set; }
-        public int AuthorId { get; set; }
-        public int CategoryId { get; set; }
         public int PublisherId { get; set; }
 
-        public Author Author { get; set; }
-        public Category Category { get; set; }
+        public ICollection<Author> Authors { get; set; } = new List<Author>();
+        public ICollection<Category> Categories { get; set; } = new List<Category>();
         public Publisher Publisher { get; set; }
-        public ICollection<BookIssue>? BookIssues { get; set; }
+        public ICollection<BookIssue>? BookIssues { get; set; } = new List<BookIssue>();
     }
 }

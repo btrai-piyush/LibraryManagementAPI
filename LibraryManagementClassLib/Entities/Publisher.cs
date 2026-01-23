@@ -17,6 +17,6 @@ namespace LibraryManagementClassLib.Entities
         [Required(ErrorMessage = "Address is required")]
         public string Address { get; set; }
 
-        public ICollection<Book>? Books { get; set; }
+        public ICollection<Book>? Books { get; set; } = new List<Book>();
     }
 }
