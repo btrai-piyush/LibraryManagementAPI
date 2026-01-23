@@ -17,6 +17,6 @@ namespace LibraryManagementClassLib.Entities
         [Required(ErrorMessage ="Last Name is required")]
         public string LastName { get; set; }
 
-        public ICollection<Book>? Books { get; set; }
+        public ICollection<Book>? Books { get; set; } = new List<Book>();
     }
 }

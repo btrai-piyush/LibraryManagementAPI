@@ -9,6 +9,6 @@ namespace LibraryManagementClassLib.Services
 {
     public interface IBookService
     {
-        Task<bool> AddBookAsync(AddBookDto addBookDto);
+        Task<string> AddBookAsync(AddBookDto addBookDto);
     }
 }
