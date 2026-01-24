@@ -23,3 +23,5 @@ namespace LibraryManagementClassLib.Data
         public DbSet<Category> Categories => Set<Category>();
     }
 }
+
+

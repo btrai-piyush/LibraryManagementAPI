@@ -22,5 +22,12 @@ namespace LibraryManagementAPI.Controllers
             var result = await _bookService.AddBookAsync(request);
             return Ok(result);
         }
+
+        [HttpGet("get-book")]
+        public async Task<IActionResult> GetBookBySearchTerm([FromQuery] string searchTerm)
+        {
+            var result = await _bookService.SearchBookAsync(searchTerm);
+            return Ok(result);
+        }
     }
 }

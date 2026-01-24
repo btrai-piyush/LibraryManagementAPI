@@ -16,9 +16,9 @@ public class BookService : IBookService
 {
     private readonly LibraryManagementAPIDbContext _context;
 
-    public BookService(LibraryManagementAPIDbContext _context)
+    public BookService(LibraryManagementAPIDbContext context)
     {
-        this._context = _context;
+        _context = context;
     }
 
     public async Task<string> AddBookAsync(AddBookDto request)
@@ -62,6 +62,19 @@ public class BookService : IBookService
         }
 
         return "An error occurred while adding the book";
+    }
+
+    public async Task<List<Book>> SearchBookAsync(string searchTerm)
+    {
+        var availableBooks = await _context.Books
+            .AsNoTracking()
+            .Where(b => b.Title.Contains(searchTerm) ||
+            b.ISBN.Contains(searchTerm) ||
+            b.Authors.Any(ba => ba.FirstName.Contains(searchTerm)) ||
+            b.Authors.Any(ba => ba.LastName.Contains(searchTerm)))
+            .ToListAsync();
+
+        return availableBooks;
     }
 
     private async Task<Author> HandleAuthorAsync(AuthorDto authorDto)

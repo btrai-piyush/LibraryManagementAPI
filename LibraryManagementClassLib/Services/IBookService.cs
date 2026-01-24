@@ -1,4 +1,5 @@
 ﻿using LibraryManagementClassLib.Dtos;
+using LibraryManagementClassLib.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,6 @@ namespace LibraryManagementClassLib.Services
     public interface IBookService
     {
         Task<string> AddBookAsync(AddBookDto addBookDto);
+        Task<List<Book>> SearchBookAsync(string searchTerm);
     }
 }
