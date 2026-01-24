@@ -8,7 +8,7 @@ namespace LibraryManagementClassLib.Services
 {
     public interface IBookIssueService
     {
-        Task<bool> BorrowBookAsync(string isbn, int memberId);
-        Task<bool> ReturnBookAsync(string isbn, int memberId);
+        Task<string> BorrowBookAsync(int userId, int bookId);
+        Task<bool> ReturnBookAsync(int userId,int bookId);
     }
 }

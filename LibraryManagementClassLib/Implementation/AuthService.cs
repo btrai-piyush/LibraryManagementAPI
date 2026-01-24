@@ -135,7 +135,7 @@ public class AuthService : IAuthService
             issuer: _config.GetValue<string>("Authentication:Issuer"),
             audience: _config.GetValue<string>("Authentication:Audience"),
             claims: claims,
-            expires: DateTime.UtcNow.AddDays(1),
+            expires: DateTime.UtcNow.AddDays(30),
             signingCredentials: creds
             );
 

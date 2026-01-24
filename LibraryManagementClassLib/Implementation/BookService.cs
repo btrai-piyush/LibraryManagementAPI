@@ -21,7 +21,7 @@ public class BookService : IBookService
         _context = context;
     }
 
-    public async Task<string> AddBookAsync(AddBookDto request)
+    public async Task<string> AddBookAsync(BookDto request)
     {
         var bookExists = await _context.Books.Where(b => b.ISBN == request.ISBN).FirstOrDefaultAsync();
         if (bookExists == null)
@@ -64,14 +64,44 @@ public class BookService : IBookService
         return "An error occurred while adding the book";
     }
 
-    public async Task<List<Book>> SearchBookAsync(string searchTerm)
+    public async Task<bool> UpdateBookAsync(Book book)
+    {
+        var existingBook = await _context.Books.FindAsync(book.Id);
+        if (existingBook == null)
+        {
+            return false;
+        }
+        existingBook.Title = book.Title;
+        existingBook.ISBN = book.ISBN;
+        existingBook.TotalCopies = book.TotalCopies;
+        existingBook.AvailableCopies = book.AvailableCopies;
+        _context.Books.Update(existingBook);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<List<BookDto>> SearchBookAsync(string searchTerm)
     {
         var availableBooks = await _context.Books
             .AsNoTracking()
             .Where(b => b.Title.Contains(searchTerm) ||
-            b.ISBN.Contains(searchTerm) ||
-            b.Authors.Any(ba => ba.FirstName.Contains(searchTerm)) ||
-            b.Authors.Any(ba => ba.LastName.Contains(searchTerm)))
+                        b.ISBN.Contains(searchTerm) ||
+                        b.Authors.Any(ba => ba.FirstName.Contains(searchTerm) || ba.LastName.Contains(searchTerm)))
+            .Select(b => new BookDto
+            {
+                Id = b.Id,
+                Title = b.Title,
+                ISBN = b.ISBN,
+                Copies = b.AvailableCopies,
+                Authors = b.Authors.Select(a => new AuthorDto
+                {
+                    FirstName = a.FirstName,
+                    LastName = a.LastName
+                }).ToList(),
+                Categories = b.Categories.Select(c => c.Name).ToList(),
+                Publisher = b.Publisher.Name,
+                PublisherAddress = b.Publisher.Address
+            })
             .ToListAsync();
 
         return availableBooks;
@@ -124,3 +154,4 @@ public class BookService : IBookService
         return publisher;
     }
 }
+

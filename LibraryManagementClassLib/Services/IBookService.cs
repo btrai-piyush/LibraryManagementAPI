@@ -10,7 +10,8 @@ namespace LibraryManagementClassLib.Services
 {
     public interface IBookService
     {
-        Task<string> AddBookAsync(AddBookDto addBookDto);
-        Task<List<Book>> SearchBookAsync(string searchTerm);
+        Task<string> AddBookAsync(BookDto addBookDto);
+        Task<List<BookDto>> SearchBookAsync(string searchTerm);
+        Task<bool> UpdateBookAsync(Book book);
     }
 }
