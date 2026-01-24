@@ -17,7 +17,7 @@ namespace LibraryManagementAPI.Controllers
         }
 
         [HttpPost("add-book")]
-        public async Task<IActionResult> AddBook(AddBookDto request)
+        public async Task<IActionResult> AddBook(BookDto request)
         {
             var result = await _bookService.AddBookAsync(request);
             return Ok(result);

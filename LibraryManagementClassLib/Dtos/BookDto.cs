@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Dtos
 {
-    public class AddBookDto
+    public class BookDto
     {
+        public int? Id { get; set; }
         [Required(ErrorMessage = "Title is required.")]
         public string Title { get; set; }
 
