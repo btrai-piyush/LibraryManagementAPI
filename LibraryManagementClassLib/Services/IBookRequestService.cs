@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Services
 {
-    public interface IBookIssueService
+    public interface IBookRequestService
     {
-        Task<string> ConfirmBorrowAsync(int userId, int bookId);
-        Task<string> ReturnBookAsync(int userId,int bookId);
+        Task<string> RequestBookAsync(int userId, int bookId);
     }
 }

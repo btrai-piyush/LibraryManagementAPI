@@ -18,7 +18,7 @@ namespace LibraryManagementAPI.Controllers
         [HttpPost("borrow")]
         public async Task<IActionResult> BorrowBook(int userId, int bookId)
         {
-            var result = await _bookIssueService.BorrowBookAsync(userId, bookId);
+            var result = await _bookIssueService.ConfirmBorrowAsync(userId, bookId);
             return Ok(result);
         }
     }
