@@ -21,8 +21,12 @@ namespace LibraryManagementClassLib.Data
         public DbSet<BookIssue> BookIssues => Set<BookIssue>();
         public DbSet<Fine> Fines => Set<Fine>();
         public DbSet<Category> Categories => Set<Category>();
+        public DbSet<BorrowRequest> BorrowRequests => Set<BorrowRequest>();
 
-        // In your DbContext class (e.g., LibraryDbContext.cs)
+        // not used currently but added for future use
+        //public DbSet<BookIssuesArchive> BookIssuesArchives => Set<BookIssuesArchive>();
+
+        // Seeding initial data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

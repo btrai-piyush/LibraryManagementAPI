@@ -1,4 +1,6 @@
-﻿using LibraryManagementClassLib.Data;
+﻿
+
+using LibraryManagementClassLib.Data;
 using LibraryManagementClassLib.Entities;
 using LibraryManagementClassLib.Services;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +22,7 @@ namespace LibraryManagementClassLib.Implementation
             _context = context;
             _bookService = bookService;
         }
-        public async Task<string> BorrowBookAsync(int userId, int bookId)
+        public async Task<string> ConfirmBorrowAsync(int userId, int bookId)
         {
             await ValidateBorrowRequestAsync(userId, bookId);
             var book = await _context.Books.FindAsync(bookId);
@@ -46,9 +48,50 @@ namespace LibraryManagementClassLib.Implementation
             return "Book borrowed successfully";
         }
 
-        public Task<bool> ReturnBookAsync(int userId, int bookId)
+        public async Task<string> ReturnBookAsync(int userId, int bookId)
         {
-            throw new NotImplementedException();
+            var bookIssue = _context.BookIssues.Where(
+                bi => bi.BookId == bookId && bi.UserId == userId).FirstOrDefault();
+            if (bookIssue == null)
+            {
+                throw new Exception("No active issue found for this book and user.");
+            }
+            if (bookIssue.Status != IssueStatus.Active)
+            {
+                throw new Exception("This book has already been returned.");
+            }
+            var fineStatus = _context.Fines.Any(f => f.BookIssueId == bookIssue.Id && f.Status == PaidStatus.Unpaid);
+            if (fineStatus)
+            {
+                throw new Exception("Cannot return book with unpaid fines.");
+            }
+            var book = _context.Books.Find(bookId);
+            if (book is null)
+            {
+                throw new Exception("Book not found.");
+            }
+            bookIssue.ReturnDate = DateTime.Today;
+            bookIssue.Status = IssueStatus.Returned;
+            book.AvailableCopies += 1;
+            try
+            {
+                _context.Books.Update(book);
+                _context.BookIssues.Update(bookIssue);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error returning book: " + ex.Message);
+            }
+            return "Book returned successfully.";
+        }
+
+        public Task<IEnumerable<BookIssue>> GetBorrowedBooksAsync(int memberId)
+        {
+            var borrowedBooks = _context.BookIssues
+                .Include(bi => bi.Book)
+                .Where(bi => bi.UserId == memberId && bi.ReturnDate == null);
+            return Task.FromResult(borrowedBooks.AsEnumerable());
         }
 
         private async Task ValidateBorrowRequestAsync(int memberId, int bookId)

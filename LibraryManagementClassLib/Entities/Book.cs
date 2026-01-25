@@ -20,5 +20,6 @@ namespace LibraryManagementClassLib.Entities
         public ICollection<Category> Categories { get; set; } = new List<Category>();
         public Publisher Publisher { get; set; }
         public ICollection<BookIssue>? BookIssues { get; set; } = new List<BookIssue>();
+        public ICollection<BorrowRequest>? BookRequests { get; set; } = new List<BorrowRequest>();
     }
 }

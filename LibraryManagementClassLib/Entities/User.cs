@@ -40,5 +40,6 @@ namespace LibraryManagementClassLib.Entities
         public bool Status { get; set; }
 
         public ICollection<BookIssue>? BookIssues { get; set; }
+        public ICollection<BorrowRequest>? BookRequests { get; set; }
     }
 }
