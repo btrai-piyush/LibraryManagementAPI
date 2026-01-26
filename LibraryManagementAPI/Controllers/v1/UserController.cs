@@ -1,13 +1,15 @@
-﻿using LibraryManagementClassLib.Dtos;
+﻿using Asp.Versioning;
+using LibraryManagementClassLib.Dtos;
 using LibraryManagementClassLib.Implementation;
 using LibraryManagementClassLib.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LibraryManagementAPI.Controllers
+namespace LibraryManagementAPI.Controllers.v1
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
     [Authorize]
     public class UserController : ControllerBase

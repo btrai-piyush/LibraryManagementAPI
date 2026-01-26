@@ -1,11 +1,13 @@
-﻿using LibraryManagementClassLib.Services;
+﻿using Asp.Versioning;
+using LibraryManagementClassLib.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LibraryManagementAPI.Controllers
+namespace LibraryManagementAPI.Controllers.v1
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
     public class FineController : ControllerBase
     {
         private readonly IFineService _fineService;

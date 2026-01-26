@@ -1,12 +1,14 @@
-﻿using LibraryManagementClassLib.Dtos;
+﻿using Asp.Versioning;
+using LibraryManagementClassLib.Dtos;
 using LibraryManagementClassLib.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LibraryManagementAPI.Controllers
+namespace LibraryManagementAPI.Controllers.v1
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
@@ -27,6 +29,13 @@ namespace LibraryManagementAPI.Controllers
         public async Task<IActionResult> GetBookBySearchTerm([FromQuery] string searchTerm)
         {
             var result = await _bookService.SearchBookAsync(searchTerm);
+            return Ok(result);
+        }
+
+        [HttpPut("update-book/{bookId}")]
+        public async Task<IActionResult> UpdateBook(int bookId, BookDto request)
+        {
+            var result = await _bookService.UpdateBookAsync(bookId, request);
             return Ok(result);
         }
     }

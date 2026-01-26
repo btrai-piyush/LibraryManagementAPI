@@ -3,6 +3,46 @@
   "WorkspaceRootPath": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementclasslib\\entities\\borrowrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|solutionrelative:librarymanagementclasslib\\entities\\borrowrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EBA48A62-E2C4-4D47-A693-360DD6C7D4AF}|LibraryManagementAPI\\LibraryManagementAPI.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementapi\\controllers\\bookissuecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EBA48A62-E2C4-4D47-A693-360DD6C7D4AF}|LibraryManagementAPI\\LibraryManagementAPI.csproj|solutionrelative:librarymanagementapi\\controllers\\bookissuecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EBA48A62-E2C4-4D47-A693-360DD6C7D4AF}|LibraryManagementAPI\\LibraryManagementAPI.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementapi\\controllers\\bookrequestcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EBA48A62-E2C4-4D47-A693-360DD6C7D4AF}|LibraryManagementAPI\\LibraryManagementAPI.csproj|solutionrelative:librarymanagementapi\\controllers\\bookrequestcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementclasslib\\entities\\publisher.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|solutionrelative:librarymanagementclasslib\\entities\\publisher.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementclasslib\\implementation\\bookrequestservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|solutionrelative:librarymanagementclasslib\\implementation\\bookrequestservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementclasslib\\entities\\bookissue.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|solutionrelative:librarymanagementclasslib\\entities\\bookissue.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementclasslib\\entities\\fine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|solutionrelative:librarymanagementclasslib\\entities\\fine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementclasslib\\entities\\book.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|solutionrelative:librarymanagementclasslib\\entities\\book.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementclasslib\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|solutionrelative:librarymanagementclasslib\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EBA48A62-E2C4-4D47-A693-360DD6C7D4AF}|LibraryManagementAPI\\LibraryManagementAPI.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementapi\\controllers\\finecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EBA48A62-E2C4-4D47-A693-360DD6C7D4AF}|LibraryManagementAPI\\LibraryManagementAPI.csproj|solutionrelative:librarymanagementapi\\controllers\\finecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementclasslib\\implementation\\fineservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|solutionrelative:librarymanagementclasslib\\implementation\\fineservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -11,24 +51,8 @@
       "RelativeMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|solutionrelative:librarymanagementclasslib\\services\\ifineservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{EBA48A62-E2C4-4D47-A693-360DD6C7D4AF}|LibraryManagementAPI\\LibraryManagementAPI.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementapi\\controllers\\bookrequestcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EBA48A62-E2C4-4D47-A693-360DD6C7D4AF}|LibraryManagementAPI\\LibraryManagementAPI.csproj|solutionrelative:librarymanagementapi\\controllers\\bookrequestcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementclasslib\\entities\\borrowrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|solutionrelative:librarymanagementclasslib\\entities\\borrowrequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementclasslib\\implementation\\bookrequestservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|solutionrelative:librarymanagementclasslib\\implementation\\bookrequestservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementclasslib\\services\\ibookrequestservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{023A6676-1DB4-437E-89A0-D84EA6432BAD}|LibraryManagementClassLib\\LibraryManagementClassLib.csproj|solutionrelative:librarymanagementclasslib\\services\\ibookrequestservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{EBA48A62-E2C4-4D47-A693-360DD6C7D4AF}|LibraryManagementAPI\\LibraryManagementAPI.csproj|c:\\users\\piyush bhattarai\\source\\repos\\librarymanagementapi\\librarymanagementapi\\controllers\\bookissuecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{EBA48A62-E2C4-4D47-A693-360DD6C7D4AF}|LibraryManagementAPI\\LibraryManagementAPI.csproj|solutionrelative:librarymanagementapi\\controllers\\bookissuecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -38,7 +62,7 @@
       "DocumentGroups": [
         {
           "DockedHeight": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 13,
           "Children": [
             {
               "$type": "Bookmark",
@@ -58,33 +82,108 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "FineService.cs",
-              "DocumentMoniker": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Implementation\\FineService.cs",
-              "RelativeDocumentMoniker": "LibraryManagementClassLib\\Implementation\\FineService.cs",
-              "ToolTip": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Implementation\\FineService.cs",
-              "RelativeToolTip": "LibraryManagementClassLib\\Implementation\\FineService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAwAAAAAAAAAA==",
+              "DocumentIndex": 3,
+              "Title": "Publisher.cs",
+              "DocumentMoniker": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Entities\\Publisher.cs",
+              "RelativeDocumentMoniker": "LibraryManagementClassLib\\Entities\\Publisher.cs",
+              "ToolTip": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Entities\\Publisher.cs",
+              "RelativeToolTip": "LibraryManagementClassLib\\Entities\\Publisher.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T14:28:40.937Z",
+              "WhenOpened": "2026-01-26T14:46:03.344Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "IFineService.cs",
-              "DocumentMoniker": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Services\\IFineService.cs",
-              "RelativeDocumentMoniker": "LibraryManagementClassLib\\Services\\IFineService.cs",
-              "ToolTip": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Services\\IFineService.cs",
-              "RelativeToolTip": "LibraryManagementClassLib\\Services\\IFineService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "DocumentIndex": 7,
+              "Title": "Book.cs",
+              "DocumentMoniker": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Entities\\Book.cs",
+              "RelativeDocumentMoniker": "LibraryManagementClassLib\\Entities\\Book.cs",
+              "ToolTip": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Entities\\Book.cs",
+              "RelativeToolTip": "LibraryManagementClassLib\\Entities\\Book.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T14:27:46.605Z",
+              "WhenOpened": "2026-01-26T14:44:27.133Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 6,
+              "Title": "Fine.cs",
+              "DocumentMoniker": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Entities\\Fine.cs",
+              "RelativeDocumentMoniker": "LibraryManagementClassLib\\Entities\\Fine.cs",
+              "ToolTip": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Entities\\Fine.cs",
+              "RelativeToolTip": "LibraryManagementClassLib\\Entities\\Fine.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-25T14:45:56.115Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "BookIssue.cs",
+              "DocumentMoniker": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Entities\\BookIssue.cs",
+              "RelativeDocumentMoniker": "LibraryManagementClassLib\\Entities\\BookIssue.cs",
+              "ToolTip": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Entities\\BookIssue.cs",
+              "RelativeToolTip": "LibraryManagementClassLib\\Entities\\BookIssue.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-25T14:35:57.22Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Entities\\User.cs",
+              "RelativeDocumentMoniker": "LibraryManagementClassLib\\Entities\\User.cs",
+              "ToolTip": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Entities\\User.cs",
+              "RelativeToolTip": "LibraryManagementClassLib\\Entities\\User.cs",
+              "ViewState": "AgIAABkAAAAAAAAAAAAqwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-25T14:35:51.836Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "FineController.cs",
+              "DocumentMoniker": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementAPI\\Controllers\\FineController.cs",
+              "RelativeDocumentMoniker": "LibraryManagementAPI\\Controllers\\FineController.cs",
+              "ToolTip": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementAPI\\Controllers\\FineController.cs",
+              "RelativeToolTip": "LibraryManagementAPI\\Controllers\\FineController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-25T14:32:09.227Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "FineService.cs",
+              "DocumentMoniker": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Implementation\\FineService.cs",
+              "RelativeDocumentMoniker": "LibraryManagementClassLib\\Implementation\\FineService.cs",
+              "ToolTip": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Implementation\\FineService.cs",
+              "RelativeToolTip": "LibraryManagementClassLib\\Implementation\\FineService.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAYwCIAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-25T14:28:40.937Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "IFineService.cs",
+              "DocumentMoniker": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Services\\IFineService.cs",
+              "RelativeDocumentMoniker": "LibraryManagementClassLib\\Services\\IFineService.cs",
+              "ToolTip": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Services\\IFineService.cs",
+              "RelativeToolTip": "LibraryManagementClassLib\\Services\\IFineService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-25T14:27:46.605Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "BookIssueController.cs",
               "DocumentMoniker": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementAPI\\Controllers\\BookIssueController.cs",
               "RelativeDocumentMoniker": "LibraryManagementAPI\\Controllers\\BookIssueController.cs",
@@ -97,7 +196,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "BorrowRequest.cs",
               "DocumentMoniker": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Entities\\BorrowRequest.cs",
               "RelativeDocumentMoniker": "LibraryManagementClassLib\\Entities\\BorrowRequest.cs",
@@ -123,7 +222,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 12,
               "Title": "IBookRequestService.cs",
               "DocumentMoniker": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementClassLib\\Services\\IBookRequestService.cs",
               "RelativeDocumentMoniker": "LibraryManagementClassLib\\Services\\IBookRequestService.cs",
@@ -131,8 +230,7 @@
               "RelativeToolTip": "LibraryManagementClassLib\\Services\\IBookRequestService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAA+AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-25T14:19:13.226Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-01-25T14:19:13.226Z"
             },
             {
               "$type": "Document",
