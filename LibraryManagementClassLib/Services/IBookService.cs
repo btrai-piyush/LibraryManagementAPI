@@ -12,6 +12,6 @@ namespace LibraryManagementClassLib.Services
     {
         Task<string> AddBookAsync(BookDto addBookDto);
         Task<List<BookDto>> SearchBookAsync(string searchTerm);
-        Task<bool> UpdateBookAsync(Book book);
+        Task<bool> UpdateBookAsync(int? bookId, BookDto bookDto);
     }
 }

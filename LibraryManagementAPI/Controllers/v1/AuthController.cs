@@ -1,4 +1,5 @@
-﻿using LibraryManagementClassLib.Dtos;
+﻿using Asp.Versioning;
+using LibraryManagementClassLib.Dtos;
 using LibraryManagementClassLib.Entities;
 using LibraryManagementClassLib.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -12,10 +13,11 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibraryManagementAPI.Controllers;
+namespace LibraryManagementAPI.Controllers.v1;
 
-[Route("api/[controller]")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [ApiController]
+[ApiVersionNeutral]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;

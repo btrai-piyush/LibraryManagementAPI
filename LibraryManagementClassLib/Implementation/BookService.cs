@@ -64,17 +64,17 @@ public class BookService : IBookService
         return "An error occurred while adding the book";
     }
 
-    public async Task<bool> UpdateBookAsync(Book book)
+    public async Task<bool> UpdateBookAsync(int? bookId, BookDto bookDto)
     {
-        var existingBook = await _context.Books.FindAsync(book.Id);
+        var existingBook = await _context.Books.FindAsync(bookId);
         if (existingBook == null)
         {
             return false;
         }
-        existingBook.Title = book.Title;
-        existingBook.ISBN = book.ISBN;
-        existingBook.TotalCopies = book.TotalCopies;
-        existingBook.AvailableCopies = book.AvailableCopies;
+        existingBook.Title = bookDto.Title;
+        existingBook.ISBN = bookDto.ISBN;
+        existingBook.TotalCopies = bookDto.Copies;
+        existingBook.AvailableCopies = bookDto.Copies;
         _context.Books.Update(existingBook);
         await _context.SaveChangesAsync();
         return true;
