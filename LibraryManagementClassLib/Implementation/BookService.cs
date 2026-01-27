@@ -21,6 +21,68 @@ public class BookService : IBookService
         _context = context;
     }
 
+    public async Task<List<BookDto>> GetAllBooksAsync(BookQueryDto queryDto)
+    {
+        var booksQuery = _context.Books.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(queryDto.SearchTerm))
+        {
+            booksQuery = booksQuery.Where(b => b.Title.ToLower().Contains(queryDto.SearchTerm) ||
+                                               b.ISBN.ToLower().Contains(queryDto.SearchTerm) ||
+                                               b.Categories.Any(c => c.Name.ToLower().Contains(queryDto.SearchTerm)) ||
+                                               b.Authors.Any(ba => ba.FirstName.ToLower().Contains(queryDto.SearchTerm) || ba.LastName.ToLower().Contains(queryDto.SearchTerm)));
+        }
+
+        if (!string.IsNullOrWhiteSpace(queryDto.SortBy))
+        {
+            if (queryDto.SortBy.Equals("title", StringComparison.OrdinalIgnoreCase))
+            {
+                booksQuery = queryDto.IsDescending
+                    ? booksQuery.OrderByDescending(b => b.Title)
+                    : booksQuery.OrderBy(b => b.Title);
+            }
+            if (queryDto.SortBy.Equals("isbn", StringComparison.OrdinalIgnoreCase))
+            {
+                booksQuery = queryDto.IsDescending
+                    ? booksQuery.OrderByDescending(b => b.ISBN)
+                    : booksQuery.OrderBy(b => b.ISBN);
+            }
+            if (queryDto.SortBy.Equals("availableCopies", StringComparison.OrdinalIgnoreCase))
+            {
+                booksQuery = queryDto.IsDescending
+                    ? booksQuery.OrderByDescending(b => b.AvailableCopies)
+                    : booksQuery.OrderBy(b => b.AvailableCopies);
+            }
+
+
+        }
+
+        var pageNumber = queryDto.PageNumber <= 0 ? 1 : queryDto.PageNumber;
+        var pageSize = queryDto.PageSize <= 0 ? 10 : queryDto.PageSize;
+
+        var skipNumber = (pageNumber - 1) * pageSize;
+        booksQuery = booksQuery.Skip(skipNumber).Take(pageSize);
+
+        var books = await booksQuery
+            .Select(b => new BookDto
+            {
+                Id = b.Id,
+                Title = b.Title,
+                ISBN = b.ISBN,
+                Copies = b.AvailableCopies,
+                Authors = b.Authors.Select(a => new AuthorDto
+                {
+                    FirstName = a.FirstName,
+                    LastName = a.LastName
+                }).ToList(),
+                Categories = b.Categories.Select(c => c.Name).ToList(),
+                Publisher = b.Publisher.Name,
+                PublisherAddress = b.Publisher.Address
+            })
+            .ToListAsync();
+        return books;
+    }
+
     public async Task<string> AddBookAsync(BookDto request)
     {
         var bookExists = await _context.Books.Where(b => b.ISBN == request.ISBN).FirstOrDefaultAsync();
@@ -80,13 +142,22 @@ public class BookService : IBookService
         return true;
     }
 
-    public async Task<List<BookDto>> SearchBookAsync(string searchTerm)
+    public async Task<bool> DeleteBookAsync(int? bookId)
     {
-        var availableBooks = await _context.Books
-            .AsNoTracking()
-            .Where(b => b.Title.Contains(searchTerm) ||
-                        b.ISBN.Contains(searchTerm) ||
-                        b.Authors.Any(ba => ba.FirstName.Contains(searchTerm) || ba.LastName.Contains(searchTerm)))
+        var existingBook = await _context.Books.FindAsync(bookId);
+        if (existingBook == null)
+        {
+            return false;
+        }
+        _context.Books.Remove(existingBook);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<BookDto> GetBookById(int bookId)
+    {
+        var availableBook = await _context.Books
+            .Where(b => b.Id == bookId)
             .Select(b => new BookDto
             {
                 Id = b.Id,
@@ -102,9 +173,12 @@ public class BookService : IBookService
                 Publisher = b.Publisher.Name,
                 PublisherAddress = b.Publisher.Address
             })
-            .ToListAsync();
-
-        return availableBooks;
+            .FirstOrDefaultAsync();
+        if (availableBook == null)
+        {
+            return null;
+        }
+        return availableBook;
     }
 
     private async Task<Author> HandleAuthorAsync(AuthorDto authorDto)
@@ -152,6 +226,15 @@ public class BookService : IBookService
             _context.Publishers.Add(publisher);
         }
         return publisher;
+    }
+
+    public async Task<string> BulkAddBooksAsync(List<BookDto> bookDtos)
+    {
+        foreach (var bookDto in bookDtos)
+        {
+            await AddBookAsync(bookDto);
+        }
+        return "Bulk insert completed successfully";
     }
 }
 
