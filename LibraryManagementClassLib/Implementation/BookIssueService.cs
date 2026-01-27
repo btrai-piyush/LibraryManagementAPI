@@ -42,7 +42,6 @@ namespace LibraryManagementClassLib.Implementation
             };
             book.AvailableCopies -= 1;
             await _context.BookIssues.AddAsync(bookIssue);
-            await _bookService.UpdateBookAsync(book);
 
             await _context.SaveChangesAsync();
             return "Book borrowed successfully";

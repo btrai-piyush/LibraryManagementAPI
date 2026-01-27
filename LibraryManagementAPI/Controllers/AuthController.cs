@@ -13,7 +13,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibraryManagementAPI.Controllers.v1;
+namespace LibraryManagementAPI.Controllers;
 
 [Route("api/v{version:apiVersion}/[controller]")]
 [ApiController]
