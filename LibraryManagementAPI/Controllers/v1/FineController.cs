@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using LibraryManagementClassLib.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace LibraryManagementAPI.Controllers.v1
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     [ApiVersion("1.0")]
+    [Authorize]
     public class FineController : ControllerBase
     {
         private readonly IFineService _fineService;
