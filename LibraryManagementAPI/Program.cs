@@ -25,12 +25,12 @@ builder.Services.AddSwaggerGen(opts =>
     });
 });
 
-//builder.Services.AddAuthorization(opts =>
-//{
-//    opts.FallbackPolicy = new AuthorizationPolicyBuilder()
-//        .RequireAuthenticatedUser()
-//        .Build();
-//});
+builder.Services.AddAuthorization(opts =>
+{
+    opts.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 
 builder.Services.AddApiVersioning(opts =>
 {

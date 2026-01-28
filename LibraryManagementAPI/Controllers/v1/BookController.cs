@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using LibraryManagementClassLib.Dtos;
 using LibraryManagementClassLib.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,6 +10,7 @@ namespace LibraryManagementAPI.Controllers.v1
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     [ApiVersion("1.0")]
+
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
@@ -27,6 +29,7 @@ namespace LibraryManagementAPI.Controllers.v1
         }
 
         [HttpPost("add-book")]
+        [Authorize(Roles = "Librarian")]
         public async Task<IActionResult> AddBook(BookDto request)
         {
             var result = await _bookService.AddBookAsync(request);
@@ -34,6 +37,7 @@ namespace LibraryManagementAPI.Controllers.v1
         }
 
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetBookById(int id)
         {
             var result = await _bookService.GetBookById(id);
@@ -41,6 +45,7 @@ namespace LibraryManagementAPI.Controllers.v1
         }
 
         [HttpPut("update-book/{bookId}")]
+        [Authorize(Roles = "Librarian")]
         public async Task<IActionResult> UpdateBook(int bookId, BookDto request)
         {
             var result = await _bookService.UpdateBookAsync(bookId, request);
@@ -48,6 +53,7 @@ namespace LibraryManagementAPI.Controllers.v1
         }
 
         [HttpDelete("delete-book/{bookId}")]
+        [Authorize(Roles = "Librarian")]
         public async Task<IActionResult> DeleteBook(int bookId)
         {
             var result = await _bookService.DeleteBookAsync(bookId);
@@ -55,6 +61,7 @@ namespace LibraryManagementAPI.Controllers.v1
         }
 
         [HttpPost("bulk-add")]
+        [Authorize(Roles = "Librarian")]
         public async Task<IActionResult> BulkAddBooks(List<BookDto> books)
         {
             var result = await _bookService.BulkAddBooksAsync(books);
