@@ -1,19 +1,16 @@
 ﻿using LibraryManagementClassLib.Data;
 using LibraryManagementClassLib.Dtos;
 using LibraryManagementClassLib.Entities;
+using LibraryManagementClassLib.Helpers;
 using LibraryManagementClassLib.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Implementation;
 
@@ -27,14 +24,15 @@ public class AuthService : IAuthService
         _context = context;
         _config = config;
     }
-    public async Task<User?> RegisterAsync(UserDto request)
+
+    public async Task<bool> RegisterAsync(UserDto request)
     {
         bool emailMatch = await _context.Users
             .AnyAsync(e => e.Email == request.Email);
 
         if (emailMatch)
         {
-            return null;
+            return false;
         }
 
         var user = new User
@@ -55,9 +53,10 @@ public class AuthService : IAuthService
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        return user;
+        return true;
     }
-    public async Task<TokenResponseDto?> LoginAsync(LoginDto request)
+
+    public async Task<TokenResponseDto?> LoginAsync(LoginDto request, string ip, string userAgent)
     {
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Email == request.Email);
@@ -73,81 +72,104 @@ public class AuthService : IAuthService
             return null;
         }
 
-        return await CreateTokenResponse(user);
-    }
+        var accessToken = TokenHelper.CreateToken(user, _config);
 
-    public async Task<TokenResponseDto?> RefreshTokensAsync(RefreshTokenRequestDto request)
-    {
-        var user = await ValidateRefreshTokenAsync(request.UserId, request.RefreshToken);
-        if (user == null)
+        var refreshToken = TokenHelper.GenerateRefreshToken();
+        var hashedToken = TokenHelper.HashToken(refreshToken);
+
+        await _context.RefreshTokens.AddAsync(new RefreshToken
         {
-            return null;
-        }
+            UserId = user.Id,
+            TokenHash = hashedToken,
+            ExpiresAtUtc = request.RememberMe ? DateTime.UtcNow.AddDays(7) : DateTime.UtcNow.AddDays(1),
+            CreatedAtUtc = DateTime.UtcNow,
+            CreatedByIp = ip,
+            UserAgent = userAgent
+        });
 
-        return await CreateTokenResponse(user);
-    }
-
-    private async Task<TokenResponseDto> CreateTokenResponse(User user)
-    {
         return new TokenResponseDto
         {
-            AccessToken = CreateToken(user),
-            RefreshToken = await GenerateAndSaveRefreshTokenAsync(user)
+            AccessToken = accessToken,
+            RefreshToken = refreshToken
         };
     }
 
-    private async Task<User?> ValidateRefreshTokenAsync(int userId, string refreshToken)
+    public async Task<TokenResponseDto?> RefreshAsync(string refreshToken, string ip, string userAgent)
     {
-        var user = await _context.Users.FindAsync(userId);
-        if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
-        {
+        var existingToken = await ValidateRefreshTokenAsync(refreshToken, ip);
+        if (existingToken == null)
             return null;
-        }
 
-        return user;
-    }
+        var newRefreshToken = TokenHelper.GenerateRefreshToken();
+        var newHashedToken = TokenHelper.HashToken(newRefreshToken);
 
-    private async Task<string> GenerateAndSaveRefreshTokenAsync(User user)
-    {
-        var refreshToken = GenerateRefreshToken();
-        user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+        // Token Rotation: Revoke the existing token and issue a new one
+        existingToken.ReplacedByTokenHash = newHashedToken;
+        existingToken.RevokedByIp = ip;
+        existingToken.RevokedAtUtc = DateTime.UtcNow;
+        _context.RefreshTokens.Update(existingToken);
+
+        _context.RefreshTokens.Add(new RefreshToken
+        {
+            UserId = existingToken.UserId,
+            TokenHash = newHashedToken,
+            ExpiresAtUtc = existingToken.ExpiresAtUtc,
+            CreatedAtUtc = DateTime.UtcNow,
+            CreatedByIp = ip,
+            UserAgent = userAgent
+        });
+
         await _context.SaveChangesAsync();
 
-        return refreshToken;
-    }
+        var user = await _context.Users.FindAsync(existingToken.UserId);
+        var newAccessToken = TokenHelper.CreateToken(user!, _config);
 
-    private string CreateToken(User user)
-    {
-        var claims = new List<Claim>
+        return new TokenResponseDto
         {
-        new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
-        new Claim(ClaimTypes.Email,user.Email),
-        new Claim(ClaimTypes.Role,user.Role.ToString())
+            AccessToken = newAccessToken,
+            RefreshToken = newRefreshToken
         };
-
-        var secretKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_config.GetValue<string>("Authentication:SecretKey")!));
-
-        var creds = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-
-        var tokenDescriptor = new JwtSecurityToken(
-            issuer: _config.GetValue<string>("Authentication:Issuer"),
-            audience: _config.GetValue<string>("Authentication:Audience"),
-            claims: claims,
-            expires: DateTime.UtcNow.AddDays(30),
-            signingCredentials: creds
-            );
-
-        return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
     }
 
-    private string GenerateRefreshToken()
+    public async Task Logout(string refreshToken, string ip)
     {
-        var randomNumber = new byte[32];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(randomNumber);
+        var hashedToken = TokenHelper.HashToken(refreshToken);
 
-        return Convert.ToBase64String(randomNumber);
+        var existingToken = await _context.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.TokenHash == hashedToken);
+
+        if (existingToken == null) return;
+
+        if (!existingToken.IsRevoked)
+        {
+            existingToken.RevokedAtUtc = DateTime.UtcNow;
+            existingToken.RevokedByIp = ip;
+            _context.RefreshTokens.Update(existingToken);
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
+    private async Task<RefreshToken?> ValidateRefreshTokenAsync(string refreshToken, string ip)
+    {
+        var hashedToken = TokenHelper.HashToken(refreshToken);
+
+        var existingToken = await _context.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.TokenHash == hashedToken);
+        if (existingToken == null)
+            return null;
+
+        if (existingToken.IsRevoked)
+        {
+            existingToken.RevokedAtUtc= DateTime.UtcNow;
+            existingToken.RevokedByIp=ip;
+            _context.RefreshTokens.Update(existingToken);
+            await _context.SaveChangesAsync();
+        }
+
+        if(!existingToken.IsActive)
+            return null;
+
+        return existingToken;
     }
 }

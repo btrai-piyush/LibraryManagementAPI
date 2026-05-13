@@ -3,6 +3,7 @@ using LibraryManagementClassLib.Dtos;
 using LibraryManagementClassLib.Entities;
 using LibraryManagementClassLib.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -15,49 +16,139 @@ using System.Threading.Tasks;
 
 namespace LibraryManagementAPI.Controllers;
 
-[Route("api/v{version:apiVersion}/[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 [ApiVersionNeutral]
 public class AuthController : ControllerBase
 {
+    private string AccessTokenCookieName = "accessToken";
+    private string RefreshTokenCookieName = "refreshToken";
+
     private readonly IAuthService _authService;
+
     public AuthController(IAuthService authService)
     {
         _authService = authService;
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult<User>> Register(UserDto request)
+    public async Task<ActionResult> Register(UserDto request)
     {
         var user = await _authService.RegisterAsync(request);
-        if (user == null)
+        if (!user)
         {
             return BadRequest("User already exists");
         }
 
-        return Ok(user);
+        return Ok("User created successfully");
     }
 
     [HttpPost("login")]
     public async Task<ActionResult<TokenResponseDto>> Login(LoginDto request)
     {
-        var result = await _authService.LoginAsync(request);
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var userAgent = Request.Headers["User-Agent"].ToString();
+        var result = await _authService.LoginAsync(request, ip, userAgent);
         if (result == null)
         {
             return BadRequest("Invalid credentials");
         }
 
-        return Ok(result);
+        SetCookies(result.AccessToken, result.RefreshToken, request.RememberMe);
+
+        return Ok(new { message = "Login successful" });
     }
 
-    [HttpPost("refresh-tokens")]
-    public async Task<ActionResult<TokenResponseDto>> RefreshToken(RefreshTokenRequestDto request)
+    [HttpGet("logout")]
+    public async Task<IActionResult> Logout()
     {
-        var results = await _authService.RefreshTokensAsync(request);
-        if (results is null || results.AccessToken is null || request.RefreshToken is null)
+        var refreshToken = Request.Cookies[RefreshTokenCookieName];
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+        if (!string.IsNullOrEmpty(refreshToken))
         {
-            return Unauthorized("Invalid refresh token");
+            await _authService.Logout(refreshToken, ip);
         }
-        return Ok(results);
+
+        ClearAuthCookies();
+
+        return Ok(new { message = "Logged out successfully" });
+    }
+
+    [HttpPost("refresh-token")]
+    public async Task<IActionResult> Refresh()
+    {
+        var token = Request.Cookies[RefreshTokenCookieName];
+        if (string.IsNullOrEmpty(token))
+            return Unauthorized();
+
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+        var userAgent = Request.Headers["User-Agent"].ToString();
+
+        var result = await _authService.RefreshAsync(token, ip, userAgent);
+        if (result == null)
+        {
+            return Unauthorized();
+        }
+
+        SetCookies(result.AccessToken, result.RefreshToken, true);
+
+        return Ok();
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public IActionResult Me()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var email = User.FindFirst(ClaimTypes.Email)?.Value;
+        var role = User.FindFirst(ClaimTypes.Role)?.Value;
+
+        return Ok(new
+        {
+            userId,
+            email,
+            role
+        });
+    }
+
+    private void ClearAuthCookies()
+    {
+        var deleteCookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Path = "/",
+            Secure = true,
+            SameSite = SameSiteMode.None
+        };
+
+        Response.Cookies.Delete(AccessTokenCookieName, deleteCookieOptions);
+        Response.Cookies.Delete(RefreshTokenCookieName, deleteCookieOptions);
+    }
+
+    private void SetCookies(string accessToken, string refreshToken, bool rememberMe)
+    {
+        var accessOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Path = "/",
+            Expires = DateTime.UtcNow.AddMinutes(30)
+        };
+
+        var refreshOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            Path = "/",
+            Expires = rememberMe
+                ? DateTime.UtcNow.AddDays(7)
+                : DateTime.UtcNow.AddDays(1)
+        };
+
+        Response.Cookies.Append(AccessTokenCookieName, accessToken, accessOptions);
+        Response.Cookies.Append(RefreshTokenCookieName, refreshToken, refreshOptions);
     }
 }

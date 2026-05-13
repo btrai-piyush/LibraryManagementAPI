@@ -12,9 +12,8 @@ namespace LibraryManagementClassLib.Entities
         Unpaid,
         Paid
     }
-    public class Fine
+    public class Fine:BaseEntity
     {
-        public int Id { get; set; }
         public int BookIssueId { get; set; }
 
         [Precision(8, 2)]

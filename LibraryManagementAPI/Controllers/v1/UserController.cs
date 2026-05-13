@@ -22,7 +22,7 @@ namespace LibraryManagementAPI.Controllers.v1
         }
 
         [Authorize(Roles = "Librarian")]
-        [HttpGet("librarian/get-all")]
+        [HttpGet]
         public async Task<ActionResult<List<UserResponseDto>>> GetAll()
         {
             var response = await _userService.GetAllUsersAsync();

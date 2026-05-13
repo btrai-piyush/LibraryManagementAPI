@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Entities
 {
-    public class Category
+    public class Category:BaseEntity
     {
-        public int Id { get; set; }
 
         [Required(ErrorMessage = "Name is required")]
         public string Name { get; set; }

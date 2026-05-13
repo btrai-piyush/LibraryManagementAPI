@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Entities
 {
-    public class BookIssuesArchive
+    public class BookIssuesArchive:BaseEntity
     {
-        public int Id { get; set; }
         public int BookId { get; set; }
         public int UserId { get; set; }
         public DateTime IssueDate { get; set; }
