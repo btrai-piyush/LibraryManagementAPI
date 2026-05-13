@@ -10,8 +10,9 @@ namespace LibraryManagementClassLib.Services
 {
     public interface IAuthService
     {
-        Task<User?> RegisterAsync(UserDto request);
-        Task<TokenResponseDto?> LoginAsync(LoginDto request);
-        Task<TokenResponseDto?> RefreshTokensAsync(RefreshTokenRequestDto request);
+        Task<bool> RegisterAsync(UserDto request);
+        Task<TokenResponseDto?> LoginAsync(LoginDto request,string ip,string userAgent);
+        Task<TokenResponseDto?> RefreshAsync(string refreshToken, string ip, string userAgent);
+        Task Logout(string refreshToken, string ip);
     }
 }

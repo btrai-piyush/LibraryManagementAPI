@@ -12,9 +12,8 @@ namespace LibraryManagementClassLib.Entities
         Issued,
         Rejected
     }
-    public class BorrowRequest
+    public class BorrowRequest:BaseEntity
     {
-        public int Id { get; set; }
         public int BookId { get; set; }
         public int UserId { get; set; }
         public DateTime RequestDate { get; set; }

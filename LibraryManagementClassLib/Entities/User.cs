@@ -12,9 +12,8 @@ namespace LibraryManagementClassLib.Entities
         Librarian,
         Member
     }
-    public class User
+    public class User : BaseEntity
     {
-        public int Id { get; set; }
 
         [Required(ErrorMessage = "First Name is required")]
         [MaxLength(50, ErrorMessage = "First Name cannot exceed 50 characters")]
@@ -27,9 +26,6 @@ namespace LibraryManagementClassLib.Entities
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string Email { get; set; }
-
-        public string? RefreshToken { get; set; }
-        public DateTime? RefreshTokenExpiryTime { get; set; }
         public Role Role { get; set; }
         public string PasswordHash { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -41,5 +37,6 @@ namespace LibraryManagementClassLib.Entities
 
         public ICollection<BookIssue>? BookIssues { get; set; }
         public ICollection<BorrowRequest>? BookRequests { get; set; }
+        public ICollection<RefreshToken>? RefreshTokens { get; set; }
     }
 }

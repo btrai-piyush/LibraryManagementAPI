@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Entities
 {
-    public class Author
+    public class Author: BaseEntity
     {
-        public int Id { get; set; }
 
         [Required(ErrorMessage = "First Name is required")]
         public string FirstName { get; set; }

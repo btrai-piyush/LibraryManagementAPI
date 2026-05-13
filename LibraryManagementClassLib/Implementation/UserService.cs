@@ -1,6 +1,8 @@
 ﻿using LibraryManagementClassLib.Data;
 using LibraryManagementClassLib.Dtos;
 using LibraryManagementClassLib.Entities;
+using LibraryManagementClassLib.Repository;
+using LibraryManagementClassLib.Repository.IRepository;
 using LibraryManagementClassLib.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,10 +16,12 @@ namespace LibraryManagementClassLib.Implementation;
 public class UserService : IUserService
 {
     private readonly LibraryManagementAPIDbContext _context;
+    private readonly IGenericRepository<User> _genericRepository;
 
-    public UserService(LibraryManagementAPIDbContext context)
+    public UserService(LibraryManagementAPIDbContext context,IGenericRepository<User> genericRepository) 
     {
         _context = context;
+        _genericRepository = genericRepository;
     }
 
     public Task<bool> DeleteAsync(int userId)
