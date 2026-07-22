@@ -23,9 +23,9 @@ namespace LibraryManagementClassLib.Data
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<BorrowRequest> BorrowRequests => Set<BorrowRequest>();
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
-
-        // not used currently but added for future use
-        //public DbSet<BookIssuesArchive> BookIssuesArchives => Set<BookIssuesArchive>();
+        public DbSet<Course> Courses => Set<Course>();
+        public DbSet<Subject> Subjects => Set<Subject>();
+        public DbSet<WishList> WishLists => Set<WishList>();
     }
 }
 

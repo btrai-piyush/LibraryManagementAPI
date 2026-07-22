@@ -19,7 +19,7 @@ namespace LibraryManagementClassLib.Dtos
         public string ISBN { get; set; }
 
         [Required(ErrorMessage = "Number of copies is required.")]
-        public int Copies { get; set; }
+        public int TotalCopies { get; set; }
 
         [Required(ErrorMessage = "Category is required.")]
         public List<string> Categories { get; set; } = new List<string>();
@@ -29,5 +29,7 @@ namespace LibraryManagementClassLib.Dtos
 
         [Required(ErrorMessage = "Publisher address is required.")]
         public string PublisherAddress { get; set; }
+        public int? AvailableCopies { get; set; }
+        public int ResultCount { get; set; }
     }
 }

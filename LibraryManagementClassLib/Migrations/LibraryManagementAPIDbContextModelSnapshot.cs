@@ -24,69 +24,17 @@ namespace LibraryManagementClassLib.Migrations
 
             modelBuilder.Entity("AuthorBook", b =>
                 {
-                    b.Property<int>("BooksId")
-                        .HasColumnType("int");
-
                     b.Property<int>("AuthorsId")
                         .HasColumnType("int");
 
-                    b.HasKey("BooksId", "AuthorsId");
+                    b.Property<int>("BooksId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("AuthorsId");
+                    b.HasKey("AuthorsId", "BooksId");
+
+                    b.HasIndex("BooksId");
 
                     b.ToTable("AuthorBook");
-
-                    b.HasData(
-                        new
-                        {
-                            BooksId = 1,
-                            AuthorsId = 1
-                        },
-                        new
-                        {
-                            BooksId = 2,
-                            AuthorsId = 2
-                        },
-                        new
-                        {
-                            BooksId = 3,
-                            AuthorsId = 3
-                        },
-                        new
-                        {
-                            BooksId = 4,
-                            AuthorsId = 4
-                        },
-                        new
-                        {
-                            BooksId = 5,
-                            AuthorsId = 5
-                        },
-                        new
-                        {
-                            BooksId = 6,
-                            AuthorsId = 6
-                        },
-                        new
-                        {
-                            BooksId = 7,
-                            AuthorsId = 7
-                        },
-                        new
-                        {
-                            BooksId = 8,
-                            AuthorsId = 8
-                        },
-                        new
-                        {
-                            BooksId = 9,
-                            AuthorsId = 9
-                        },
-                        new
-                        {
-                            BooksId = 10,
-                            AuthorsId = 10
-                        });
                 });
 
             modelBuilder.Entity("BookCategory", b =>
@@ -102,78 +50,36 @@ namespace LibraryManagementClassLib.Migrations
                     b.HasIndex("CategoriesId");
 
                     b.ToTable("BookCategory");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            BooksId = 1,
-                            CategoriesId = 1
-                        },
-                        new
-                        {
-                            BooksId = 1,
-                            CategoriesId = 3
-                        },
-                        new
-                        {
-                            BooksId = 2,
-                            CategoriesId = 1
-                        },
-                        new
-                        {
-                            BooksId = 3,
-                            CategoriesId = 1
-                        },
-                        new
-                        {
-                            BooksId = 4,
-                            CategoriesId = 1
-                        },
-                        new
-                        {
-                            BooksId = 4,
-                            CategoriesId = 6
-                        },
-                        new
-                        {
-                            BooksId = 5,
-                            CategoriesId = 4
-                        },
-                        new
-                        {
-                            BooksId = 5,
-                            CategoriesId = 10
-                        },
-                        new
-                        {
-                            BooksId = 6,
-                            CategoriesId = 4
-                        },
-                        new
-                        {
-                            BooksId = 7,
-                            CategoriesId = 1
-                        },
-                        new
-                        {
-                            BooksId = 7,
-                            CategoriesId = 5
-                        },
-                        new
-                        {
-                            BooksId = 8,
-                            CategoriesId = 5
-                        },
-                        new
-                        {
-                            BooksId = 9,
-                            CategoriesId = 1
-                        },
-                        new
-                        {
-                            BooksId = 10,
-                            CategoriesId = 1
-                        });
+            modelBuilder.Entity("BookSubject", b =>
+                {
+                    b.Property<int>("BooksId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubjectsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BooksId", "SubjectsId");
+
+                    b.HasIndex("SubjectsId");
+
+                    b.ToTable("BookSubject");
+                });
+
+            modelBuilder.Entity("BookWishList", b =>
+                {
+                    b.Property<int>("BooksId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WishListsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BooksId", "WishListsId");
+
+                    b.HasIndex("WishListsId");
+
+                    b.ToTable("BookWishList");
                 });
 
             modelBuilder.Entity("LibraryManagementClassLib.Entities.Author", b =>
@@ -195,68 +101,6 @@ namespace LibraryManagementClassLib.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Authors");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            FirstName = "George",
-                            LastName = "Orwell"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            FirstName = "Harper",
-                            LastName = "Lee"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            FirstName = "F. Scott",
-                            LastName = "Fitzgerald"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            FirstName = "Jane",
-                            LastName = "Austen"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            FirstName = "J.K.",
-                            LastName = "Rowling"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            FirstName = "J.R.R.",
-                            LastName = "Tolkien"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            FirstName = "Stephen",
-                            LastName = "King"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            FirstName = "Agatha",
-                            LastName = "Christie"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            FirstName = "Ernest",
-                            LastName = "Hemingway"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            FirstName = "Gabriel",
-                            LastName = "García Márquez"
-                        });
                 });
 
             modelBuilder.Entity("LibraryManagementClassLib.Entities.Book", b =>
@@ -289,98 +133,6 @@ namespace LibraryManagementClassLib.Migrations
                     b.HasIndex("PublisherId");
 
                     b.ToTable("Books");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AvailableCopies = 8,
-                            ISBN = "978-0451524935",
-                            PublisherId = 1,
-                            Title = "1984",
-                            TotalCopies = 10
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AvailableCopies = 6,
-                            ISBN = "978-0446310789",
-                            PublisherId = 2,
-                            Title = "To Kill a Mockingbird",
-                            TotalCopies = 8
-                        },
-                        new
-                        {
-                            Id = 3,
-                            AvailableCopies = 10,
-                            ISBN = "978-0743273565",
-                            PublisherId = 3,
-                            Title = "The Great Gatsby",
-                            TotalCopies = 12
-                        },
-                        new
-                        {
-                            Id = 4,
-                            AvailableCopies = 12,
-                            ISBN = "978-1503290563",
-                            PublisherId = 4,
-                            Title = "Pride and Prejudice",
-                            TotalCopies = 15
-                        },
-                        new
-                        {
-                            Id = 5,
-                            AvailableCopies = 15,
-                            ISBN = "978-0439708180",
-                            PublisherId = 5,
-                            Title = "Harry Potter and the Sorcerer's Stone",
-                            TotalCopies = 20
-                        },
-                        new
-                        {
-                            Id = 6,
-                            AvailableCopies = 7,
-                            ISBN = "978-0547928227",
-                            PublisherId = 1,
-                            Title = "The Hobbit",
-                            TotalCopies = 10
-                        },
-                        new
-                        {
-                            Id = 7,
-                            AvailableCopies = 5,
-                            ISBN = "978-0307743657",
-                            PublisherId = 2,
-                            Title = "The Shining",
-                            TotalCopies = 8
-                        },
-                        new
-                        {
-                            Id = 8,
-                            AvailableCopies = 4,
-                            ISBN = "978-0062073501",
-                            PublisherId = 3,
-                            Title = "Murder on the Orient Express",
-                            TotalCopies = 6
-                        },
-                        new
-                        {
-                            Id = 9,
-                            AvailableCopies = 6,
-                            ISBN = "978-0684801223",
-                            PublisherId = 4,
-                            Title = "The Old Man and the Sea",
-                            TotalCopies = 7
-                        },
-                        new
-                        {
-                            Id = 10,
-                            AvailableCopies = 7,
-                            ISBN = "978-0060883287",
-                            PublisherId = 5,
-                            Title = "One Hundred Years of Solitude",
-                            TotalCopies = 9
-                        });
                 });
 
             modelBuilder.Entity("LibraryManagementClassLib.Entities.BookIssue", b =>
@@ -408,6 +160,9 @@ namespace LibraryManagementClassLib.Migrations
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("isArchived")
+                        .HasColumnType("bit");
 
                     b.HasKey("Id");
 
@@ -462,58 +217,30 @@ namespace LibraryManagementClassLib.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Fiction"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Non-Fiction"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Science Fiction"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Fantasy"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "Mystery"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Name = "Romance"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Name = "Biography"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Name = "History"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Name = "Science"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Name = "Children"
-                        });
+            modelBuilder.Entity("LibraryManagementClassLib.Entities.Course", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Courses");
                 });
 
             modelBuilder.Entity("LibraryManagementClassLib.Entities.Fine", b =>
@@ -564,38 +291,106 @@ namespace LibraryManagementClassLib.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Publishers");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Address = "1745 Broadway, New York, NY 10019",
-                            Name = "Penguin Random House"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Address = "195 Broadway, New York, NY 10007",
-                            Name = "HarperCollins"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Address = "1230 Avenue of the Americas, New York, NY 10020",
-                            Name = "Simon & Schuster"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Address = "120 Broadway, New York, NY 10271",
-                            Name = "Macmillan Publishers"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Address = "1290 Avenue of the Americas, New York, NY 10104",
-                            Name = "Hachette Book Group"
-                        });
+            modelBuilder.Entity("LibraryManagementClassLib.Entities.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedByIp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiresAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReplacedByTokenHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RevokedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RevokedByIp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserAgent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
+            modelBuilder.Entity("LibraryManagementClassLib.Entities.StudentDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Semester")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("StudentDetail");
+                });
+
+            modelBuilder.Entity("LibraryManagementClassLib.Entities.Subject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SemesterCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("Subjects");
                 });
 
             modelBuilder.Entity("LibraryManagementClassLib.Entities.User", b =>
@@ -632,12 +427,6 @@ namespace LibraryManagementClassLib.Migrations
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
 
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("RefreshTokenExpiryTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("Role")
                         .HasColumnType("int");
 
@@ -647,6 +436,25 @@ namespace LibraryManagementClassLib.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("LibraryManagementClassLib.Entities.WishList", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("WishLists");
                 });
 
             modelBuilder.Entity("AuthorBook", b =>
@@ -675,6 +483,36 @@ namespace LibraryManagementClassLib.Migrations
                     b.HasOne("LibraryManagementClassLib.Entities.Category", null)
                         .WithMany()
                         .HasForeignKey("CategoriesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BookSubject", b =>
+                {
+                    b.HasOne("LibraryManagementClassLib.Entities.Book", null)
+                        .WithMany()
+                        .HasForeignKey("BooksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LibraryManagementClassLib.Entities.Subject", null)
+                        .WithMany()
+                        .HasForeignKey("SubjectsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BookWishList", b =>
+                {
+                    b.HasOne("LibraryManagementClassLib.Entities.Book", null)
+                        .WithMany()
+                        .HasForeignKey("BooksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LibraryManagementClassLib.Entities.WishList", null)
+                        .WithMany()
+                        .HasForeignKey("WishListsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -739,6 +577,58 @@ namespace LibraryManagementClassLib.Migrations
                     b.Navigation("BookIssue");
                 });
 
+            modelBuilder.Entity("LibraryManagementClassLib.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("LibraryManagementClassLib.Entities.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LibraryManagementClassLib.Entities.StudentDetail", b =>
+                {
+                    b.HasOne("LibraryManagementClassLib.Entities.Course", "Course")
+                        .WithMany("StudentDetails")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LibraryManagementClassLib.Entities.User", "User")
+                        .WithOne("StudentDetail")
+                        .HasForeignKey("LibraryManagementClassLib.Entities.StudentDetail", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LibraryManagementClassLib.Entities.Subject", b =>
+                {
+                    b.HasOne("LibraryManagementClassLib.Entities.Course", "Course")
+                        .WithMany("Subjects")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("LibraryManagementClassLib.Entities.WishList", b =>
+                {
+                    b.HasOne("LibraryManagementClassLib.Entities.User", "User")
+                        .WithOne("WishList")
+                        .HasForeignKey("LibraryManagementClassLib.Entities.WishList", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("LibraryManagementClassLib.Entities.Book", b =>
                 {
                     b.Navigation("BookIssues");
@@ -752,6 +642,13 @@ namespace LibraryManagementClassLib.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("LibraryManagementClassLib.Entities.Course", b =>
+                {
+                    b.Navigation("StudentDetails");
+
+                    b.Navigation("Subjects");
+                });
+
             modelBuilder.Entity("LibraryManagementClassLib.Entities.Publisher", b =>
                 {
                     b.Navigation("Books");
@@ -762,6 +659,12 @@ namespace LibraryManagementClassLib.Migrations
                     b.Navigation("BookIssues");
 
                     b.Navigation("BookRequests");
+
+                    b.Navigation("RefreshTokens");
+
+                    b.Navigation("StudentDetail");
+
+                    b.Navigation("WishList");
                 });
 #pragma warning restore 612, 618
         }

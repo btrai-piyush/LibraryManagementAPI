@@ -32,7 +32,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<ActionResult> Register(UserDto request)
+    public async Task<ActionResult> Register(RegisterDto request)
     {
         var user = await _authService.RegisterAsync(request);
         if (!user)
@@ -134,7 +134,7 @@ public class AuthController : ControllerBase
             Secure = true,
             SameSite = SameSiteMode.None,
             Path = "/",
-            Expires = DateTime.UtcNow.AddMinutes(30)
+            Expires = DateTime.UtcNow.AddDays(7)
         };
 
         var refreshOptions = new CookieOptions

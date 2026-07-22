@@ -1,6 +1,7 @@
 ﻿
 
 using LibraryManagementClassLib.Data;
+using LibraryManagementClassLib.Dtos;
 using LibraryManagementClassLib.Entities;
 using LibraryManagementClassLib.Services;
 using Microsoft.EntityFrameworkCore;
@@ -22,40 +23,55 @@ namespace LibraryManagementClassLib.Implementation
             _context = context;
             _bookService = bookService;
         }
-        public async Task<string> ConfirmBorrowAsync(int userId, int bookId)
+        public async Task<string> IssueBookAsync(int requestId, DateTime dueDate)
         {
-            await ValidateBorrowRequestAsync(userId, bookId);
-            var book = await _context.Books.FindAsync(bookId);
-            var member = await _context.Users.FindAsync(userId);
-            if (book is null || member is null)
+            var borrowRequest = await _context.BorrowRequests.FindAsync(requestId);
+            if (borrowRequest != null)
             {
-                return "Book or member not found";
+                try
+                {
+                    await using var transaction = await _context.Database.BeginTransactionAsync();
+
+                    await ValidateBorrowRequestAsync(borrowRequest.UserId, borrowRequest.BookId);
+
+                    borrowRequest.Status = RequestStatus.Issued;
+                    await _context.SaveChangesAsync();
+
+                    var bookIssue = new BookIssue
+                    {
+                        BookId = borrowRequest.BookId,
+                        UserId = borrowRequest.UserId,
+                        IssueDate = DateTime.Today,
+                        DueDate = dueDate,
+                        Status = IssueStatus.Active
+                    };
+                    _context.BookIssues.Add(bookIssue);
+                    await _context.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Error issuing book: " + ex.Message);
+                }
+            }
+            else
+            {
+                throw new Exception("Borrow request not found.");
             }
 
-            var bookIssue = new BookIssue
-            {
-                BookId = bookId,
-                UserId = userId,
-                IssueDate = DateTime.Now,
-                DueDate = DateTime.Now.AddDays(14),
-                Status = IssueStatus.Active
-            };
-            book.AvailableCopies -= 1;
-            await _context.BookIssues.AddAsync(bookIssue);
-
-            await _context.SaveChangesAsync();
-            return "Book borrowed successfully";
+            return "Book request approved successfully.";
         }
 
-        public async Task<string> ReturnBookAsync(int userId, int bookId)
+        public async Task<string> ReturnBookAsync(int issueId)
         {
             var bookIssue = _context.BookIssues.Where(
-                bi => bi.BookId == bookId && bi.UserId == userId).FirstOrDefault();
+                bi => bi.Id == issueId).FirstOrDefault();
             if (bookIssue == null)
             {
                 throw new Exception("No active issue found for this book and user.");
             }
-            if (bookIssue.Status != IssueStatus.Active)
+            if (bookIssue.Status == IssueStatus.Returned)
             {
                 throw new Exception("This book has already been returned.");
             }
@@ -64,7 +80,7 @@ namespace LibraryManagementClassLib.Implementation
             {
                 throw new Exception("Cannot return book with unpaid fines.");
             }
-            var book = _context.Books.Find(bookId);
+            var book = _context.Books.Find(bookIssue.BookId);
             if (book is null)
             {
                 throw new Exception("Book not found.");
@@ -85,12 +101,45 @@ namespace LibraryManagementClassLib.Implementation
             return "Book returned successfully.";
         }
 
-        public Task<IEnumerable<BookIssue>> GetBorrowedBooksAsync(int memberId)
+        public async Task<List<BookIssuesDto>> GetBookIssuesByUserIdAsync(int userId)
         {
-            var borrowedBooks = _context.BookIssues
+            var bookIssues = await _context.BookIssues
                 .Include(bi => bi.Book)
-                .Where(bi => bi.UserId == memberId && bi.ReturnDate == null);
-            return Task.FromResult(borrowedBooks.AsEnumerable());
+                .Include(bi => bi.User)
+                .Where(bi => bi.UserId == userId && bi.ReturnDate == null)
+                .Select(bi => new BookIssuesDto
+                {
+                    BookIssueId = bi.Id,
+                    Book = new BookDto
+                    {
+                        Id = bi.Book.Id,
+                        Title = bi.Book.Title,
+                        Authors = bi.Book.Authors.Select(a => new AuthorDto
+                        {
+                            FirstName = a.FirstName,
+                            LastName = a.LastName
+                        }).ToList(),
+                        ISBN = bi.Book.ISBN,
+                        AvailableCopies = bi.Book.AvailableCopies,
+                        Publisher = bi.Book.Publisher.Name,
+                    },
+                    User = new UserDto
+                    {
+                        FirstName = bi.User.FirstName,
+                        LastName = bi.User.LastName,
+                        Email = bi.User.Email
+                    },
+                    IssuedDate = bi.IssueDate,
+                    DueDate = bi.DueDate,
+                    Status = bi.Status.ToString()
+                })
+                .ToListAsync();
+            if(bookIssues == null || !bookIssues.Any())
+            {
+                throw new Exception("No active book issues found for this user.");
+            }
+
+            return bookIssues;
         }
 
         private async Task ValidateBorrowRequestAsync(int memberId, int bookId)
@@ -100,12 +149,79 @@ namespace LibraryManagementClassLib.Implementation
             {
                 throw new InvalidOperationException("Book is not available for borrowing.");
             }
-            var activeIssues = await _context.BookIssues
-                .CountAsync(bi => bi.UserId == memberId && bi.ReturnDate == null);
-            if (activeIssues >= 1)
+
+            book.AvailableCopies -= 1;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<BookIssuesDto>> GetAllBookIssuesAsync(GeneralQueryDto query)
+        {
+            var bookIssuesQuery = _context.BookIssues
+                .Include(bi => bi.Book)
+                .Include(bi => bi.User)
+                .AsQueryable();
+
+            if(!string.IsNullOrEmpty(query.SearchTerm))
             {
-                throw new InvalidOperationException("Member has reached the maximum number of borrowed books.");
+                var searchTerm = query.SearchTerm.ToLower();
+                bookIssuesQuery = bookIssuesQuery.Where(bi =>
+                    bi.Book.Title.ToLower().Contains(searchTerm) ||
+                    bi.User.FirstName.ToLower().Contains(searchTerm) ||
+                    bi.User.LastName.ToLower().Contains(searchTerm));
             }
+
+            var queryCount = await bookIssuesQuery.CountAsync();
+
+            bookIssuesQuery = bookIssuesQuery.OrderBy(bi => bi.IssueDate);
+
+            var pageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
+            var pageSize = query.PageSize <= 0 ? 10 : query.PageSize;
+            var skip = (pageNumber - 1) * pageSize;
+
+            bookIssuesQuery = bookIssuesQuery.Skip(skip).Take(pageSize);
+
+            return await bookIssuesQuery
+                .Select(bi => new BookIssuesDto
+                {
+                    BookIssueId = bi.Id,
+                    Book = new BookDto
+                    {
+                        Id = bi.Book.Id,
+                        Title = bi.Book.Title,
+                        Authors = bi.Book.Authors.Select(a => new AuthorDto
+                        {
+                            FirstName = a.FirstName,
+                            LastName = a.LastName
+                        }).ToList(),
+                        ISBN = bi.Book.ISBN,
+                        AvailableCopies = bi.Book.AvailableCopies,
+                        Publisher = bi.Book.Publisher.Name,
+                    },
+                    User = new UserDto
+                    {
+                        FirstName = bi.User.FirstName,
+                        LastName = bi.User.LastName,
+                        Email = bi.User.Email
+                    },
+                    IssuedDate = bi.IssueDate,
+                    DueDate = bi.DueDate,
+                    Status = bi.Status.ToString(),
+                    TotalCount = queryCount
+                })
+                .ToListAsync();
+        }
+
+        public async  Task UpdateBookIssueStatus()
+        {
+            var bookIssues=await _context.BookIssues.Where(bi=>bi.Status==IssueStatus.Active).ToListAsync();
+            foreach (var bookIssue in bookIssues)
+            {
+                if(bookIssue.DueDate< DateTime.Now)
+                {
+                    bookIssue.Status = IssueStatus.Overdue;
+                }
+            }
+            await _context.SaveChangesAsync();
         }
     }
 }

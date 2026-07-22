@@ -25,7 +25,7 @@ public class AuthService : IAuthService
         _config = config;
     }
 
-    public async Task<bool> RegisterAsync(UserDto request)
+    public async Task<bool> RegisterAsync(RegisterDto request)
     {
         bool emailMatch = await _context.Users
             .AnyAsync(e => e.Email == request.Email);
@@ -40,7 +40,7 @@ public class AuthService : IAuthService
             FirstName = request.FirstName,
             LastName = request.LastName,
             Email = request.Email,
-            Role = Role.Member,
+            Role = Role.user,
             CreatedAt = DateTime.Now,
             Phone = request.Phone,
             Status = true
@@ -86,6 +86,7 @@ public class AuthService : IAuthService
             CreatedByIp = ip,
             UserAgent = userAgent
         });
+        await _context.SaveChangesAsync();
 
         return new TokenResponseDto
         {

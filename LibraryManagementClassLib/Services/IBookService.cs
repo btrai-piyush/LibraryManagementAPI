@@ -10,11 +10,12 @@ namespace LibraryManagementClassLib.Services
 {
     public interface IBookService
     {
-        Task<List<BookDto>> GetAllBooksAsync(BookQueryDto queryDto);
+        Task<List<BookDto>> AdminGetAllBooksAsync(BookQueryDto queryDto);
         Task<string> AddBookAsync(BookDto addBookDto);
         Task<BookDto> GetBookById(int bookId);
         Task<bool> UpdateBookAsync(int? bookId, BookDto bookDto);
         Task<bool> DeleteBookAsync(int? bookId);
         Task<string> BulkAddBooksAsync(List<BookDto> books);
+        Task<List<BookDto>> UserGetAllBooksAsync(BookQueryDto queryDto);
     }
 }

@@ -1,8 +1,6 @@
 ﻿using Asp.Versioning;
 using LibraryManagementClassLib.Dtos;
 using LibraryManagementClassLib.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagementAPI.Controllers.v1
@@ -21,10 +19,18 @@ namespace LibraryManagementAPI.Controllers.v1
         }
 
         [HttpGet("get-all")]
-        public async Task<IActionResult> GetAll([FromQuery] BookQueryDto query)
+        public async Task<IActionResult> AdminGetAll([FromQuery] BookQueryDto query)
         {
             query.SearchTerm = query.SearchTerm?.Trim().ToLower();
-            var books = await _bookService.GetAllBooksAsync(query);
+            var books = await _bookService.AdminGetAllBooksAsync(query);
+            return Ok(books);
+        }
+
+        [HttpGet("get-all-user")]
+        public async Task<IActionResult> UserGetAll([FromQuery] BookQueryDto query)
+        {
+            query.SearchTerm = query.SearchTerm?.Trim().ToLower();
+            var books = await _bookService.UserGetAllBooksAsync(query);
             return Ok(books);
         }
 

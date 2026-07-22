@@ -10,6 +10,13 @@ using Microsoft.AspNetCore.Authorization;
 using LibraryManagementClassLib.Repository.IRepository;
 using LibraryManagementClassLib.Repository;
 
+string[] allowedOrigins =
+{
+    "http://localhost:5173",
+    "https://patanlibrarymanager.vercel.app"
+};
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -55,6 +62,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IBookIssueService, BookIssueService>();
 builder.Services.AddScoped<IBookRequestService, BookRequestService>();
+builder.Services.AddScoped<IWishListService, WishListService>();
+builder.Services.AddScoped<IFineService, FineService>();
 
 builder.Services
     .AddAuthentication(options =>
@@ -95,13 +104,16 @@ builder.Services
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+
+    options.AddPolicy("AllowSpecificOrigin", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowCredentials();
     });
 });
+
 
 var app = builder.Build();
 
@@ -115,9 +127,9 @@ app.UseSwaggerUI(opts =>
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowSpecificOrigin");
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors();
 app.MapControllers();
 
 app.Run();

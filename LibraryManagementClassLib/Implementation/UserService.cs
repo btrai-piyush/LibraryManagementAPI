@@ -41,7 +41,7 @@ public class UserService : IUserService
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
-                Role = user.Role,
+                Role = user.Role.ToString(),
                 CreatedAt = user.CreatedAt,
                 Phone = user.Phone,
                 Status = user.Status
@@ -63,7 +63,27 @@ public class UserService : IUserService
             FirstName = user.FirstName,
             LastName = user.LastName,
             Email = user.Email,
-            Role = user.Role,
+            Role = user.Role.ToString(),
+            CreatedAt = user.CreatedAt,
+            Phone = user.Phone,
+            Status = user.Status
+        };
+    }
+
+    public async Task<UserResponseDto> GetByEmailAsync(string email)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+        return new UserResponseDto
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            Role = user.Role.ToString(),
             CreatedAt = user.CreatedAt,
             Phone = user.Phone,
             Status = user.Status
