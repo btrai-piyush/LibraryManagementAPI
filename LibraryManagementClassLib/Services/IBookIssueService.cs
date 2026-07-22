@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibraryManagementClassLib.Dtos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,10 @@ namespace LibraryManagementClassLib.Services
 {
     public interface IBookIssueService
     {
-        Task<string> ConfirmBorrowAsync(int userId, int bookId);
-        Task<string> ReturnBookAsync(int userId,int bookId);
+        Task<string> IssueBookAsync(int requestId, DateTime dueDate);
+        Task<string> ReturnBookAsync(int issueId);
+        Task<List<BookIssuesDto>> GetAllBookIssuesAsync(GeneralQueryDto query);
+        Task<List<BookIssuesDto>> GetBookIssuesByUserIdAsync(int userId);
+        Task UpdateBookIssueStatus();
     }
 }

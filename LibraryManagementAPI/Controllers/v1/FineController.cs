@@ -1,4 +1,5 @@
 ﻿using Asp.Versioning;
+using LibraryManagementClassLib.Dtos;
 using LibraryManagementClassLib.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -9,7 +10,7 @@ namespace LibraryManagementAPI.Controllers.v1
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     [ApiVersion("1.0")]
-    [Authorize]
+    //[Authorize]
     public class FineController : ControllerBase
     {
         private readonly IFineService _fineService;
@@ -24,6 +25,13 @@ namespace LibraryManagementAPI.Controllers.v1
         {
             var fine = await _fineService.GetFineAsync(issueId);
             return Ok(fine);
+        }
+
+        [HttpPost("get-all")]
+        public async Task<IActionResult> GetAllFines(GeneralQueryDto query)  
+        {
+            var fines = await _fineService.CalculateAllFines(query);
+            return Ok(fines);
         }
     }
 }

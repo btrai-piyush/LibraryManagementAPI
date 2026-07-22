@@ -20,7 +20,6 @@ namespace LibraryManagementClassLib.Entities
         public decimal Amount { get; set; }
         public PaidStatus Status { get; set; }
         public DateTime? PaidDate { get; set; }
-
         public BookIssue BookIssue { get; set; }
     }
 }

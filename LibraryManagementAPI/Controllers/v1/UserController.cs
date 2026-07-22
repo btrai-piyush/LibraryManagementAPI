@@ -11,7 +11,7 @@ namespace LibraryManagementAPI.Controllers.v1
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersion("1.0")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -38,6 +38,20 @@ namespace LibraryManagementAPI.Controllers.v1
                 return NotFound();
             }
             return Ok(response);
+        }
+
+        [HttpGet("{email}")]
+        public async Task<ActionResult<UserResponseDto>> GetByEmail(string email)
+        {
+            try
+            {
+                var response = await _userService.GetByEmailAsync(email);
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                return NotFound(e.Message);
+            }
         }
     }
 }

@@ -20,8 +20,8 @@ namespace LibraryManagementClassLib.Entities
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }
         public IssueStatus Status { get; set; }
-
-        public Fine Fine { get; set; }
+        public bool isArchived { get; set; } = false;
+        public Fine? Fine { get; set; }
         public Book Book { get; set; }
         public User User { get; set; }
 
