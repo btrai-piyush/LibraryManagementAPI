@@ -73,29 +73,35 @@ builder.Services
     })
     .AddJwtBearer(options =>
     {
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
+            ValidateIssuer = false,
+            ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Authentication:Issuer"],
-            ValidAudience = builder.Configuration["Authentication:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Authentication:SecretKey"]!)
-            )
+        Encoding.UTF8.GetBytes(builder.Configuration["Authentication:SecretKey"]!)
+    ),
+            ClockSkew = TimeSpan.Zero
         };
 
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
             {
-                if (string.IsNullOrWhiteSpace(context.Token) &&
-                    context.Request.Cookies.TryGetValue("AccessToken", out var accessToken))
+                if (context.Request.Cookies.TryGetValue("accessToken", out var token))
                 {
-                    context.Token = accessToken;
+                    context.Token = token;
                 }
 
+                return Task.CompletedTask;
+            },
+
+            OnAuthenticationFailed = context =>
+            {
+                context.Response.Headers["X-Auth-Error"] = context.Exception.GetType().Name;
+                context.Response.Headers["X-Auth-Message"] = context.Exception.Message;
                 return Task.CompletedTask;
             }
         };

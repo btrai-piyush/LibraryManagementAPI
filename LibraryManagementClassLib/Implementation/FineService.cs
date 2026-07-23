@@ -58,13 +58,13 @@ namespace LibraryManagementClassLib.Implementation
             var response = new List<FineDto>();
 
             var bookIssues = _context.BookIssues.
-                Where(bi => bi.DueDate < DateTime.Now)
+                Where(bi => bi.DueDate.Date < DateTime.Today.Date)
                 .Include(bi => bi.Fine)
                 .Include(bi => bi.Book)
                 .Include(bi => bi.User)
                 .AsQueryable();
 
-            if(!string.IsNullOrWhiteSpace(query.SearchTerm))
+            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
             {
                 bookIssues = bookIssues.Where(bi => bi.Book.Title.Contains(query.SearchTerm)
                                                     || bi.User.FirstName.Contains(query.SearchTerm)
@@ -99,7 +99,7 @@ namespace LibraryManagementClassLib.Implementation
                     bookIssue.Fine.Amount = fineAmount;
                 }
 
-                await _context.SaveChangesAsync();
+
 
                 var fineDto = new FineDto()
                 {
@@ -122,14 +122,112 @@ namespace LibraryManagementClassLib.Implementation
                             LastName = bookIssue.User.LastName,
                             Email = bookIssue.User.Email
                         },
+                        DueDate = bookIssue.DueDate,
                     },
                     TotalCount = queryCount
                 };
 
                 response.Add(fineDto);
+
             }
+            await _context.SaveChangesAsync();
 
             return response;
+        }
+
+        public async Task<List<FineDto>> GetUserFines(UserFineQueryDto query)
+        {
+            var finesQuery = _context.Fines
+                .Include(f => f.BookIssue)
+                .ThenInclude(bi => bi.User)
+                .Where(f => f.BookIssue.UserId == query.UserId)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
+            {
+                var searchTerm = query.SearchTerm.ToLower();
+                finesQuery = finesQuery.Where(f => f.BookIssue.Book.Title.Contains(searchTerm)
+                                        || f.BookIssue.User.FirstName.Contains(searchTerm)
+                                        || f.BookIssue.User.LastName.Contains(searchTerm));
+            }
+
+            var queryCount = await finesQuery.CountAsync();
+
+            finesQuery = finesQuery.OrderByDescending(f => f.BookIssue.DueDate);
+
+            var pageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
+            var pageSize = query.PageSize <= 0 ? 10 : query.PageSize;
+            var skip = (pageNumber - 1) * pageSize;
+
+            finesQuery = finesQuery.Skip(skip).Take(pageSize);
+
+            if (!string.IsNullOrEmpty(query.Status))
+            {
+                if (query.Status.ToLower() == "paid")
+                {
+                    finesQuery = finesQuery.Where(f => f.Status == PaidStatus.Paid);
+
+                }
+                else if (query.Status.ToLower() == "unpaid")
+                {
+                    finesQuery = finesQuery.Where(f => f.Status == PaidStatus.Unpaid);
+                }
+            }
+
+            if (await finesQuery.CountAsync() == 0)
+            {
+                if(query.Status != null)
+                {
+                    throw new InvalidOperationException($"No {query.Status.ToLower()} fines found.");
+                }
+
+                throw new InvalidOperationException("No fines found for the specified user.");
+            }
+
+            var userFines = finesQuery.Select(f => new FineDto
+            {
+                Id = f.Id,
+                Amount = f.Amount,
+                Status = f.Status.ToString(),
+                PaidDate = f.PaidDate,
+                BookIssue = new BookIssuesDto
+                {
+                    Book = new BookDto
+                    {
+                        Id = f.BookIssue.Book.Id,
+                        Title = f.BookIssue.Book.Title,
+                        ISBN = f.BookIssue.Book.ISBN,
+                    },
+                    //User = new UserDto
+                    //{
+                    //    Id = f.BookIssue.User.Id,
+                    //    FirstName = f.BookIssue.User.FirstName,
+                    //    LastName = f.BookIssue.User.LastName,
+                    //    Email = f.BookIssue.User.Email
+                    //},
+                    DueDate = f.BookIssue.DueDate,
+                    TotalCount = queryCount
+                }
+            }).ToList();
+
+
+            return userFines;
+        }
+
+        public async Task<string> PayFineAsync(int fineId)
+        {
+            var fine = await _context.Fines.FindAsync(fineId);
+
+            if (fine == null)
+            {
+                throw new InvalidOperationException("Fine not found.");
+            }
+
+            fine.Status= PaidStatus.Paid;
+            fine.PaidDate= DateTime.Now;
+            await _context.SaveChangesAsync();
+
+            return "Fine paid successfully.";
         }
 
         private decimal CalculateFine(DateTime dueDate)

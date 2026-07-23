@@ -101,12 +101,56 @@ namespace LibraryManagementClassLib.Implementation
             return "Book returned successfully.";
         }
 
-        public async Task<List<BookIssuesDto>> GetBookIssuesByUserIdAsync(int userId)
+        public async Task<List<BookIssuesDto>> GetBookIssuesByUserIdAsync(UserBookIssueQueryDto query)
         {
-            var bookIssues = await _context.BookIssues
+            var bookIssues = _context.BookIssues
                 .Include(bi => bi.Book)
                 .Include(bi => bi.User)
-                .Where(bi => bi.UserId == userId && bi.ReturnDate == null)
+                .Where(bi => bi.User.Id == query.UserId)
+                .AsQueryable();
+
+            if(!string.IsNullOrEmpty(query.SearchTerm))
+            {
+                var searchTerm = query.SearchTerm.ToLower();
+                bookIssues = bookIssues.Where(bi =>
+                    bi.Book.Title.ToLower().Contains(searchTerm) ||
+                    bi.User.FirstName.ToLower().Contains(searchTerm) ||
+                    bi.User.LastName.ToLower().Contains(searchTerm));
+            }
+
+            if (!string.IsNullOrEmpty(query.Status))
+            {
+                var status = query.Status.ToLower();
+
+                if (status != "returned")
+                {
+                    bookIssues = bookIssues.Where(bi => bi.Status != IssueStatus.Returned);
+                }
+                else
+                {
+                    if (Enum.TryParse<IssueStatus>(query.Status, true, out var issueStatus))
+                    {
+                        bookIssues = bookIssues.Where(bi => bi.Status == issueStatus);
+                    }
+                    else
+                    {
+                        throw new Exception("Invalid status value.");
+                    }
+                }
+            }
+            else
+            {
+                bookIssues = bookIssues.Where(bi => bi.Status != IssueStatus.Returned);
+            }
+
+            var queryCount = await bookIssues.CountAsync();
+
+            var pageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
+            var pageSize = query.PageSize <= 0 ? 10 : query.PageSize;
+            var skip = (pageNumber - 1) * pageSize;
+            bookIssues = bookIssues.Skip(skip).Take(pageSize);
+
+            var bookIssuesList = await bookIssues
                 .Select(bi => new BookIssuesDto
                 {
                     BookIssueId = bi.Id,
@@ -123,23 +167,20 @@ namespace LibraryManagementClassLib.Implementation
                         AvailableCopies = bi.Book.AvailableCopies,
                         Publisher = bi.Book.Publisher.Name,
                     },
-                    User = new UserDto
-                    {
-                        FirstName = bi.User.FirstName,
-                        LastName = bi.User.LastName,
-                        Email = bi.User.Email
-                    },
                     IssuedDate = bi.IssueDate,
                     DueDate = bi.DueDate,
-                    Status = bi.Status.ToString()
+                    ReturnedDate = bi.ReturnDate,
+                    Status = bi.Status.ToString(),
+                    TotalCount = queryCount
                 })
                 .ToListAsync();
-            if(bookIssues == null || !bookIssues.Any())
+
+            if(bookIssuesList == null || !bookIssuesList.Any())
             {
-                throw new Exception("No active book issues found for this user.");
+                throw new Exception("No book issues found for this user.");
             }
 
-            return bookIssues;
+            return bookIssuesList;
         }
 
         private async Task ValidateBorrowRequestAsync(int memberId, int bookId)
@@ -205,6 +246,7 @@ namespace LibraryManagementClassLib.Implementation
                     },
                     IssuedDate = bi.IssueDate,
                     DueDate = bi.DueDate,
+                    ReturnedDate = bi.ReturnDate,
                     Status = bi.Status.ToString(),
                     TotalCount = queryCount
                 })

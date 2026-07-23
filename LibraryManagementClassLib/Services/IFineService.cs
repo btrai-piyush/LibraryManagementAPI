@@ -7,5 +7,7 @@ namespace LibraryManagementClassLib.Services
     {
         Task<Fine> GetFineAsync(int isssueId);
         Task<List<FineDto>> CalculateAllFines(GeneralQueryDto query);
+        Task<List<FineDto>> GetUserFines(UserFineQueryDto query);
+        Task<string> PayFineAsync(int fineId);
     }
 }

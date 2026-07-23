@@ -76,12 +76,12 @@ namespace LibraryManagementAPI.Controllers.v1
             }
         }
 
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetBorrowedBooks(int userId)
+        [HttpPost("user")]
+        public async Task<IActionResult> GetBorrowedBooks(UserBookIssueQueryDto query)
         {
             try
             {
-                var result = await _bookIssueService.GetBookIssuesByUserIdAsync(userId);
+                var result = await _bookIssueService.GetBookIssuesByUserIdAsync(query);
                 return Ok(result);
             }
             catch (Exception ex)
