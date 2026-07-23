@@ -31,6 +31,17 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
+    [HttpGet("debug")]
+    public IActionResult Debug()
+    {
+        return Ok(new
+        {
+            Cookies = Request.Cookies.Keys.ToList(),
+            HasAccessToken = Request.Cookies.ContainsKey("accessToken"),
+            AccessToken = Request.Cookies["accessToken"]?.Substring(0, 20)
+        });
+    }
+
     [HttpPost("register")]
     public async Task<ActionResult> Register(RegisterDto request)
     {
@@ -46,17 +57,24 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult<TokenResponseDto>> Login(LoginDto request)
     {
-        var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-        var userAgent = Request.Headers["User-Agent"].ToString();
-        var result = await _authService.LoginAsync(request, ip, userAgent);
-        if (result == null)
+        try
         {
-            return BadRequest("Invalid credentials");
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+            var userAgent = Request.Headers["User-Agent"].ToString();
+            var result = await _authService.LoginAsync(request, ip, userAgent);
+            if (result == null)
+            {
+                return BadRequest("Invalid credentials");
+            }
+
+            SetCookies(result.AccessToken, result.RefreshToken, request.RememberMe);
+
+            return Ok(new { message = "Login successful" });
         }
-
-        SetCookies(result.AccessToken, result.RefreshToken, request.RememberMe);
-
-        return Ok(new { message = "Login successful" });
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 
     [HttpGet("logout")]

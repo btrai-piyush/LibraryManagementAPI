@@ -13,6 +13,7 @@ namespace LibraryManagementClassLib.Dtos
         public UserDto User { get; set; }
         public DateTime IssuedDate { get; set; }
         public DateTime DueDate { get; set; }
+        public DateTime? ReturnedDate { get; set; }
         public string Status { get; set; }
         public int TotalCount { get; set; }
     }
