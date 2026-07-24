@@ -89,4 +89,33 @@ public class UserService : IUserService
             Status = user.Status
         };
     }
+
+    public Task<UserResponseDto> GetStudentDetails(int studentId)
+    {
+        var student = _context.Users.Include(u => u.StudentDetail)
+            .ThenInclude(sd => sd.Course)
+            .FirstOrDefault(u => u.Id == studentId);
+
+        if (student == null)
+        {
+            throw new Exception("Student not found");
+        }
+
+        return Task.FromResult(new UserResponseDto
+        {
+            Id = student.Id,
+            FirstName = student.FirstName,
+            LastName = student.LastName,
+            Email = student.Email,
+            Role = student.Role.ToString(),
+            CreatedAt = student.CreatedAt,
+            Phone = student.Phone,
+            Status = student.Status,
+            StudentDetail = new StudentDetailDto
+            {
+                CourseName = student.StudentDetail.Course.Name,
+                Semester = student.StudentDetail.Semester
+            }
+        });
+    }
 }

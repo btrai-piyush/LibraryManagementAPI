@@ -60,5 +60,12 @@ namespace LibraryManagementAPI.Controllers.v1
             var result = await _bookRequestService.UndoRequest(request.UserId, request.BookId, request.RemoveFromWishlist);
             return Ok(result);
         }
+
+        [HttpPost("user-history")]
+        public async Task<IActionResult> GetBookRequestHistory(GeneralQueryDto query)
+        {
+            var history = await _bookRequestService.GetBookRequestHistoryByUser(query);
+            return Ok(history);
+        }
     }
 }

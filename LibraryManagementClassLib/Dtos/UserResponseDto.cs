@@ -18,5 +18,6 @@ namespace LibraryManagementClassLib.Dtos
         public DateTime CreatedAt { get; set; }
         public string Phone { get; set; }
         public bool Status { get; set; }
+        public StudentDetailDto? StudentDetail { get; set; }
     }
 }

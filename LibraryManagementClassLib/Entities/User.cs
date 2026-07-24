@@ -38,6 +38,7 @@ namespace LibraryManagementClassLib.Entities
         public ICollection<BookIssue>? BookIssues { get; set; }
         public ICollection<BorrowRequest>? BookRequests { get; set; }
         public ICollection<RefreshToken>? RefreshTokens { get; set; }
+        public ICollection<ActivityLog>? ActivityLogs { get; set; }
 
         public StudentDetail? StudentDetail { get; set; }
         public WishList? WishList { get; set; }

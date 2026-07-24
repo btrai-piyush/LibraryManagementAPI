@@ -258,7 +258,7 @@ namespace LibraryManagementClassLib.Implementation
             var bookIssues=await _context.BookIssues.Where(bi=>bi.Status==IssueStatus.Active).ToListAsync();
             foreach (var bookIssue in bookIssues)
             {
-                if(bookIssue.DueDate< DateTime.Now)
+                if(bookIssue.DueDate.Date < DateTime.Today)
                 {
                     bookIssue.Status = IssueStatus.Overdue;
                 }

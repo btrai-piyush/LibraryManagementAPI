@@ -1,6 +1,7 @@
 ﻿using LibraryManagementClassLib.Data;
 using LibraryManagementClassLib.Dtos;
 using LibraryManagementClassLib.Entities;
+using LibraryManagementClassLib.Helpers;
 using LibraryManagementClassLib.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -183,10 +184,14 @@ namespace LibraryManagementClassLib.Implementation
 
         public Task<string> RejectBookRequest(int requestId)
         {
-            var borrowRequest = _context.BorrowRequests.FirstOrDefault(br => br.Id == requestId);
+            var borrowRequest = _context.BorrowRequests.Include(br=>br.Book).FirstOrDefault(br => br.Id == requestId);
             if (borrowRequest != null)
             {
                 borrowRequest.Status = RequestStatus.Rejected;
+
+                var activityLog = ActivityLogHelper.CreateActivity(borrowRequest.UserId, ActivityType.BookRequestRejected, $"Rejected request for \"{borrowRequest.Book.Title}\"", null, borrowRequest.BookId);
+                _context.ActivityLogs.Add(activityLog);
+
                 _context.SaveChanges();
                 return Task.FromResult("Request status updated successfully.");
             }
@@ -194,6 +199,56 @@ namespace LibraryManagementClassLib.Implementation
             {
                 throw new InvalidOperationException("Borrow request not found.");
             }
+        }
+
+        public async Task<List<RequestedBooksDto>> GetBookRequestHistoryByUser(GeneralQueryDto query)
+        {
+            var userRequestsQuery = _context.BorrowRequests
+                .Where(br => br.UserId == query.SearchId)
+                .Include(br => br.Book.Authors)
+                .Include(br => br.User)
+                .AsNoTracking()
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(query.SearchTerm))
+            {
+                userRequestsQuery = userRequestsQuery.Where(br =>
+                    br.Book.Title.Contains(query.SearchTerm) ||
+                    br.Book.Authors.Any(a => a.FirstName.Contains(query.SearchTerm) || a.LastName.Contains(query.SearchTerm)) ||
+                    br.User.FirstName.Contains(query.SearchTerm) ||
+                    br.User.LastName.Contains(query.SearchTerm));
+            }
+
+            var queryCount = await userRequestsQuery.CountAsync();
+            userRequestsQuery=userRequestsQuery.OrderByDescending(br => br.RequestDate);
+
+            var pageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
+            var pageSize = query.PageSize <= 0 ? 10 : query.PageSize;
+            var skip = (pageNumber - 1) * pageSize;
+            userRequestsQuery = userRequestsQuery.Skip(skip).Take(pageSize);
+
+            var response = await userRequestsQuery
+                .Select(br => new RequestedBooksDto
+                {
+                    Id = br.Id,
+                    Book = new BookDto
+                    {
+                        Id = br.Book.Id,
+                        Title = br.Book.Title,
+                        Authors = br.Book.Authors.Select(a => new AuthorDto
+                        {
+                            FirstName = a.FirstName,
+                            LastName = a.LastName
+                        }).ToList(),
+                        Publisher = br.Book.Publisher.Name
+                    },
+                    RequestDate = br.RequestDate,
+                    Status = br.Status.ToString(),
+                    TotalCount = queryCount
+                })
+                .ToListAsync();
+
+            return response;
         }
     }
 }

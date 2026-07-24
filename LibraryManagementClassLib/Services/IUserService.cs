@@ -14,5 +14,6 @@ namespace LibraryManagementClassLib.Services
         Task<UserResponseDto> GetUserByIdAsync(int userId);
         Task<bool> DeleteAsync(int userId);
         Task<UserResponseDto> GetByEmailAsync(string email);
+        Task<UserResponseDto> GetStudentDetails(int studentId);
     }
 }

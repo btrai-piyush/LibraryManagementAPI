@@ -5,6 +5,7 @@ using LibraryManagementClassLib.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LibraryManagementAPI.Controllers.v1
 {
@@ -46,6 +47,27 @@ namespace LibraryManagementAPI.Controllers.v1
             try
             {
                 var response = await _userService.GetByEmailAsync(email);
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
+        [HttpGet("student-details/{studentId}")]
+        public async Task<ActionResult<UserResponseDto>> GetStudentDetails([FromRoute] int studentId)
+        {
+            try
+            {
+                var userId = int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int parsedUserId);
+                var role = User.FindFirst(ClaimTypes.Role)?.Value.ToLower();
+
+                if (role!="admin" && parsedUserId != studentId)
+                {
+                    return Unauthorized("You are not authorized to access this resource.");
+                }
+                var response = await _userService.GetStudentDetails(studentId);
                 return Ok(response);
             }
             catch (Exception e)

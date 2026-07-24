@@ -13,7 +13,8 @@ using LibraryManagementClassLib.Repository;
 string[] allowedOrigins =
 {
     "http://localhost:5173",
-    "https://patanlibrarymanager.vercel.app"
+    "https://patanlibrarymanager.vercel.app",
+    "http://localhost:5185",
 };
 
 
@@ -64,6 +65,7 @@ builder.Services.AddScoped<IBookIssueService, BookIssueService>();
 builder.Services.AddScoped<IBookRequestService, BookRequestService>();
 builder.Services.AddScoped<IWishListService, WishListService>();
 builder.Services.AddScoped<IFineService, FineService>();
+builder.Services.AddScoped<ICommonService, CommonService>();
 
 builder.Services
     .AddAuthentication(options =>
@@ -123,19 +125,25 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-
 app.UseSwagger();
 app.UseSwaggerUI(opts =>
 {
-    opts.RoutePrefix = "";
+    opts.RoutePrefix = "docs";
     opts.SwaggerEndpoint("/swagger/v1/swagger.json", "Real Estate API v1");
 });
 
 app.UseHttpsRedirection();
 
 app.UseCors("AllowSpecificOrigin");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.MapControllers();
+
+app.MapFallbackToFile("index.html");
 
 app.Run();

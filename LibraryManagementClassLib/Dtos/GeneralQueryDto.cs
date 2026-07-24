@@ -8,6 +8,7 @@ namespace LibraryManagementClassLib.Dtos
 {
     public class GeneralQueryDto
     {
+        public int? SearchId { get; set; }
         public string? SearchTerm { get; set; } = null;
         public string? SortBy { get; set; } = null;
         public bool IsDescending { get; set; } = false;
