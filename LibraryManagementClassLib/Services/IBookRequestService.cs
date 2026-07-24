@@ -14,5 +14,6 @@ namespace LibraryManagementClassLib.Services
         Task<string> UndoRequest(int userId, int bookId, bool removeWishlistItem = false);
         Task<List<RequestedBooksDto>> GetAllRequestedBooksAsync(GeneralQueryDto query);
         Task<string> RejectBookRequest(int requestId);
+        Task<List<RequestedBooksDto>> GetBookRequestHistoryByUser(GeneralQueryDto query);
     }
 }

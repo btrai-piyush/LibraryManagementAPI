@@ -210,6 +210,9 @@ namespace LibraryManagementClassLib.Implementation
                 }
             }).ToList();
 
+            var totalFineAmount = userFines.Sum(f => f.Amount);
+
+            userFines.ForEach(f => f.TotalFineAmount = totalFineAmount);
 
             return userFines;
         }

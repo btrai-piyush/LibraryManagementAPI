@@ -18,7 +18,7 @@ namespace LibraryManagementClassLib.Dtos
         public DateTime? PaidDate { get; set; }
 
         public BookIssuesDto BookIssue { get; set; }
-
+        public decimal TotalFineAmount { get; set; }
         public int TotalCount { get; set; }
     }
 }

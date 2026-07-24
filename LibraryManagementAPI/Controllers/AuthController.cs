@@ -136,8 +136,8 @@ public class AuthController : ControllerBase
         {
             HttpOnly = true,
             Path = "/",
-            Secure = true,
-            SameSite = SameSiteMode.None
+            Secure = false,
+            SameSite = SameSiteMode.Lax
         };
 
         Response.Cookies.Delete(AccessTokenCookieName, deleteCookieOptions);
@@ -149,8 +149,8 @@ public class AuthController : ControllerBase
         var accessOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.None,
+            Secure = false,
+            SameSite = SameSiteMode.Lax,
             Path = "/",
             Expires = DateTime.UtcNow.AddDays(7)
         };
@@ -158,8 +158,8 @@ public class AuthController : ControllerBase
         var refreshOptions = new CookieOptions
         {
             HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.None,
+            Secure = false,
+            SameSite = SameSiteMode.Lax,
             Path = "/",
             Expires = rememberMe
                 ? DateTime.UtcNow.AddDays(7)

@@ -26,6 +26,7 @@ namespace LibraryManagementClassLib.Data
         public DbSet<Course> Courses => Set<Course>();
         public DbSet<Subject> Subjects => Set<Subject>();
         public DbSet<WishList> WishLists => Set<WishList>();
+        public DbSet<ActivityLog> ActivityLogs => Set<ActivityLog>();
     }
 }
 

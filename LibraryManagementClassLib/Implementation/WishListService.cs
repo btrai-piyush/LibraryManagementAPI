@@ -1,6 +1,7 @@
 ﻿using LibraryManagementClassLib.Data;
 using LibraryManagementClassLib.Dtos;
 using LibraryManagementClassLib.Entities;
+using LibraryManagementClassLib.Helpers;
 using LibraryManagementClassLib.Migrations;
 using LibraryManagementClassLib.Services;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +51,9 @@ namespace LibraryManagementClassLib.Implementation
                 throw new Exception("Already added to wish list.");
             }
 
+            var activityLog = ActivityLogHelper.CreateActivity(request.UserId, ActivityType.BookWishlisted, $"Wishlisted \"{book.Title}\"", null, book.Id);
+
+            _context.ActivityLogs.Add(activityLog);
             wishList.Books.Add(book);
 
 
@@ -90,6 +94,7 @@ namespace LibraryManagementClassLib.Implementation
             var book = wishList.Books.FirstOrDefault(b => b.Id == request.BookId);
             if (book == null) return "Book not found in wish list.";
 
+            var activityLog = ActivityLogHelper.CreateActivity(request.UserId, ActivityType.BookUnwishlisted, $"Removed \"{book.Title}\" from wish list", null, book.Id);
             wishList.Books.Remove(book);
             await _context.SaveChangesAsync();
             return "Book removed from wish list successfully.";
