@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Implementation
@@ -36,6 +37,7 @@ namespace LibraryManagementClassLib.Implementation
 
                 var wishlist = await _context.WishLists
                     .Include(w => w.Books)
+                    .Include(w=>w.User)
                     .FirstOrDefaultAsync(w => w.UserId == userId);
 
                 if (wishlist != null)
@@ -45,7 +47,17 @@ namespace LibraryManagementClassLib.Implementation
                     if (book != null)
                     {
                         wishlist.Books.Remove(book);
+
+                        var activityMetadata = JsonSerializer.Serialize(new
+                        {
+                            BookTitle=book.Title,
+                            UserName = $"{wishlist.User.FirstName} {wishlist.User.LastName}",
+                        });
+
+                        var activityLog = ActivityLogHelper.CreateActivity(userId, ActivityType.BookRequested, $"Requested book \"{book.Title}\"", activityMetadata);
+                        await _context.ActivityLogs.AddAsync(activityLog);
                     }
+
                 }
 
 
@@ -90,6 +102,8 @@ namespace LibraryManagementClassLib.Implementation
         public async Task<string> UndoRequest(int userId, int bookId, bool removeWishlistItem = false)
         {
             var borrowRequest = await _context.BorrowRequests
+                .Include(br => br.Book)
+                .Include(br => br.User)
                 .FirstOrDefaultAsync(br => br.UserId == userId && br.BookId == bookId && br.Status == RequestStatus.Pending);
 
             if (borrowRequest == null)
@@ -98,6 +112,14 @@ namespace LibraryManagementClassLib.Implementation
             }
 
             _context.BorrowRequests.Remove(borrowRequest);
+
+            var activityMetadata = JsonSerializer.Serialize(new
+            {
+                BookTitle = borrowRequest.Book.Title,
+                UserName = $"{borrowRequest.User.FirstName} {borrowRequest.User.LastName}",
+            });
+            var activityLog = ActivityLogHelper.CreateActivity(userId, ActivityType.BookRequestCancelled, $"Undid request for \"{borrowRequest.Book.Title}\"", activityMetadata);
+            await _context.ActivityLogs.AddAsync(activityLog);
             await _context.SaveChangesAsync();
 
             if (!removeWishlistItem)
@@ -120,7 +142,7 @@ namespace LibraryManagementClassLib.Implementation
             return "Book request undone successfully.";
         }
 
-        public async Task<List<RequestedBooksDto>> GetAllRequestedBooksAsync(GeneralQueryDto query)
+        public async Task<List<RequestedBooksDto>> GetUserBookRequestsAsync(GeneralQueryDto query)
         {
             var bookRequestsQuery = _context.BorrowRequests
                 .Where(br => br.Status == RequestStatus.Pending)
@@ -129,67 +151,24 @@ namespace LibraryManagementClassLib.Implementation
                 .AsNoTracking()
                 .AsQueryable();
 
-            if(!string.IsNullOrEmpty(query.SearchTerm))
-            {
-                bookRequestsQuery = bookRequestsQuery.Where(br =>
-                    br.Book.Title.Contains(query.SearchTerm) ||
-                    br.Book.Authors.Any(a => a.FirstName.Contains(query.SearchTerm) || a.LastName.Contains(query.SearchTerm)) ||
-                    br.User.FirstName.Contains(query.SearchTerm) ||
-                    br.User.LastName.Contains(query.SearchTerm));
-            }
-
-            var queryCount = await bookRequestsQuery.CountAsync();
-
-            bookRequestsQuery.OrderBy(br => br.RequestDate);
-
-            var pageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
-            var pageSize = query.PageSize <= 0 ? 10 : query.PageSize;
-            var skip = (pageNumber - 1) * pageSize;
-
-            bookRequestsQuery = bookRequestsQuery.Skip(skip).Take(pageSize);
-            
-            var response = await bookRequestsQuery
-                .Select(br => new RequestedBooksDto
-                {
-                    Id = br.Id,
-                    Book = new BookDto
-                    {
-                        Id = br.Book.Id,
-                        Title = br.Book.Title,
-                        Authors = br.Book.Authors.Select(a => new AuthorDto
-                        {
-                            FirstName = a.FirstName,
-                            LastName = a.LastName
-                        }).ToList(),
-                        Publisher = br.Book.Publisher.Name,
-                        PublisherAddress = br.Book.Publisher.Address,
-                        ISBN = br.Book.ISBN,
-                        AvailableCopies = br.Book.AvailableCopies
-                    },
-                    User = new UserDto
-                    {
-                        Id = br.User.Id,
-                        FirstName = br.User.FirstName,
-                        LastName = br.User.LastName,
-                        Email = br.User.Email
-                    },
-                    RequestDate = br.RequestDate,
-                    Status = br.Status.ToString(),
-                    TotalCount = queryCount
-                })
-                .ToListAsync();
-
-            return response;
+            var result = await CommonRequestQuery(query, bookRequestsQuery);
+            return result;
         }
 
         public Task<string> RejectBookRequest(int requestId)
         {
-            var borrowRequest = _context.BorrowRequests.Include(br=>br.Book).FirstOrDefault(br => br.Id == requestId);
+            var borrowRequest = _context.BorrowRequests.Include(br => br.Book).FirstOrDefault(br => br.Id == requestId);
             if (borrowRequest != null)
             {
                 borrowRequest.Status = RequestStatus.Rejected;
 
-                var activityLog = ActivityLogHelper.CreateActivity(borrowRequest.UserId, ActivityType.BookRequestRejected, $"Rejected request for \"{borrowRequest.Book.Title}\"", null, borrowRequest.BookId);
+                var activityMetadata = JsonSerializer.Serialize(new
+                {
+                    BookTitle = borrowRequest.Book.Title,
+                    UserName = $"{borrowRequest.User.FirstName} {borrowRequest.User.LastName}",
+                });
+
+                var activityLog = ActivityLogHelper.CreateActivity(borrowRequest.UserId, ActivityType.BookRequestRejected, $"Rejected request for \"{borrowRequest.Book.Title}\"", activityMetadata);
                 _context.ActivityLogs.Add(activityLog);
 
                 _context.SaveChanges();
@@ -210,24 +189,56 @@ namespace LibraryManagementClassLib.Implementation
                 .AsNoTracking()
                 .AsQueryable();
 
+           var result = await CommonRequestQuery(query, userRequestsQuery);
+            return result;
+        }
+
+        public async Task<List<RequestedBooksDto>> AdminGetPendingRequests(GeneralQueryDto query)
+        {
+            var pendingRequestsQuery = _context.BorrowRequests
+                .Where(br => br.Status == RequestStatus.Pending)
+                .Include(br => br.Book.Authors)
+                .Include(br => br.User)
+                .AsNoTracking()
+                .AsQueryable();
+            var result = await CommonRequestQuery(query, pendingRequestsQuery);
+            return result;
+        }
+
+        public async Task<List<RequestedBooksDto>> AdminGetRequestHistory(GeneralQueryDto query)
+        {
+            var requestHistoryQuery = _context.BorrowRequests
+                .Where(br => br.Status != RequestStatus.Pending)
+                .Include(br => br.Book.Authors)
+                .Include(br => br.User)
+                .AsNoTracking()
+                .AsQueryable();
+            var result = await CommonRequestQuery(query, requestHistoryQuery);
+            return result;
+        }
+
+        private async Task<List<RequestedBooksDto>> CommonRequestQuery(GeneralQueryDto query, IQueryable<BorrowRequest> requestsQuery)
+        {
             if (!string.IsNullOrEmpty(query.SearchTerm))
             {
-                userRequestsQuery = userRequestsQuery.Where(br =>
+                requestsQuery = requestsQuery.Where(br =>
                     br.Book.Title.Contains(query.SearchTerm) ||
-                    br.Book.Authors.Any(a => a.FirstName.Contains(query.SearchTerm) || a.LastName.Contains(query.SearchTerm)) ||
+                    br.Book.Authors.Any(a => a.FirstName.Contains(query.SearchTerm) || 
+                                             a.LastName.Contains(query.SearchTerm) ||
+                                             (a.FirstName + " " + a.LastName).Contains(query.SearchTerm)) ||
                     br.User.FirstName.Contains(query.SearchTerm) ||
                     br.User.LastName.Contains(query.SearchTerm));
             }
 
-            var queryCount = await userRequestsQuery.CountAsync();
-            userRequestsQuery=userRequestsQuery.OrderByDescending(br => br.RequestDate);
+            var queryCount = await requestsQuery.CountAsync();
 
+            requestsQuery = requestsQuery.OrderByDescending(br => br.RequestDate);
             var pageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
             var pageSize = query.PageSize <= 0 ? 10 : query.PageSize;
             var skip = (pageNumber - 1) * pageSize;
-            userRequestsQuery = userRequestsQuery.Skip(skip).Take(pageSize);
+            requestsQuery = requestsQuery.Skip(skip).Take(pageSize);
 
-            var response = await userRequestsQuery
+            var response = await requestsQuery
                 .Select(br => new RequestedBooksDto
                 {
                     Id = br.Id,
@@ -240,14 +251,21 @@ namespace LibraryManagementClassLib.Implementation
                             FirstName = a.FirstName,
                             LastName = a.LastName
                         }).ToList(),
-                        Publisher = br.Book.Publisher.Name
+                        Publisher = br.Book.Publisher.Name,
+                        AvailableCopies =br.Book.AvailableCopies,
+                    },
+                    User = new UserDto
+                    {
+                        Id = br.User.Id,
+                        FirstName = br.User.FirstName,
+                        LastName = br.User.LastName,
+                        Email = br.User.Email
                     },
                     RequestDate = br.RequestDate,
                     Status = br.Status.ToString(),
                     TotalCount = queryCount
                 })
                 .ToListAsync();
-
             return response;
         }
     }

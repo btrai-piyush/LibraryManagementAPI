@@ -19,5 +19,6 @@ namespace LibraryManagementClassLib.Dtos
         public string Phone { get; set; }
         public bool Status { get; set; }
         public StudentDetailDto? StudentDetail { get; set; }
+        public int TotalCount { get; set; }
     }
 }

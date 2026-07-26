@@ -12,7 +12,10 @@ namespace LibraryManagementClassLib.Services
         Task<string> IssueBookAsync(int requestId, DateTime dueDate);
         Task<string> ReturnBookAsync(int issueId);
         Task<List<BookIssuesDto>> GetAllBookIssuesAsync(GeneralQueryDto query);
-        Task<List<BookIssuesDto>> GetBookIssuesByUserIdAsync(UserBookIssueQueryDto query);
+        Task<List<BookIssuesDto>> GetActiveBookIssuesByUserIdAsync(GeneralQueryDto query);
+        Task<List<BookIssuesDto>> GetBookIssuesHistoryByUserIdAsync(GeneralQueryDto query);
+        Task<List<BookIssuesDto>> AdminGetActiveIssues(GeneralQueryDto query);
+        Task<List<BookIssuesDto>> AdminGetIssuesHistory(GeneralQueryDto query);
         Task UpdateBookIssueStatus();
     }
 }

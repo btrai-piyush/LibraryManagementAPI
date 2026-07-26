@@ -9,6 +9,7 @@ namespace LibraryManagementClassLib.Services
 {
     public interface ICommonService
     {
-      Task<UserDashboardDto> UserDashboard(int userId);
+        Task<UserDashboardDto> UserDashboard(int userId);
+        Task<AdminDashboardDto> AdminDashboard();
     }
 }

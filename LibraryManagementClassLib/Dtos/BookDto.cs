@@ -31,5 +31,6 @@ namespace LibraryManagementClassLib.Dtos
         public string PublisherAddress { get; set; }
         public int? AvailableCopies { get; set; }
         public int ResultCount { get; set; }
+        public List<string> Subjects { get; set; } = new List<string>();
     }
 }

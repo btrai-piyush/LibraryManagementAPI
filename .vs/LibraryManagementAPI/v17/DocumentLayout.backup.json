@@ -89,8 +89,7 @@
               "RelativeToolTip": "..\\..\\..\\AppData\\Roaming\\Microsoft\\UserSecrets\\ddbf6b49-92fc-41db-9e14-95d4a1348bd2\\secrets.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-07-22T17:08:53.318Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-22T17:08:53.318Z"
             },
             {
               "$type": "Document",
@@ -102,8 +101,7 @@
               "RelativeToolTip": "LibraryManagementAPI\\Controllers\\AuthController.cs",
               "ViewState": "AgIAACIAAAAAAAAAAAAQwDQAAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-07-22T17:06:36.348Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-22T17:06:36.348Z"
             },
             {
               "$type": "Document",
@@ -115,8 +113,7 @@
               "RelativeToolTip": "LibraryManagementAPI\\appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-07-22T16:45:59.436Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-22T16:45:59.436Z"
             },
             {
               "$type": "Document",
@@ -128,8 +125,7 @@
               "RelativeToolTip": "LibraryManagementAPI\\appsettings.Development.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-07-22T16:45:55.684Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-22T16:45:55.684Z"
             },
             {
               "$type": "Document",
@@ -141,8 +137,7 @@
               "RelativeToolTip": "LibraryManagementAPI\\appsettings.Production.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2026-07-22T16:45:50.507Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-07-22T16:45:50.507Z"
             },
             {
               "$type": "Document",
@@ -154,8 +149,7 @@
               "RelativeToolTip": "LibraryManagementClassLib\\Services\\IAuthService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAxwA0AAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-05T12:15:43.388Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-05-05T12:15:43.388Z"
             },
             {
               "$type": "Document",
@@ -177,7 +171,7 @@
               "RelativeDocumentMoniker": "LibraryManagementAPI\\Program.cs",
               "ToolTip": "C:\\Users\\Piyush Bhattarai\\source\\repos\\LibraryManagementAPI\\LibraryManagementAPI\\Program.cs",
               "RelativeToolTip": "LibraryManagementAPI\\Program.cs",
-              "ViewState": "AgIAADsAAAAAAAAAAAAxwFYAAAAKAAAAAAAAAA==",
+              "ViewState": "AgIAADsAAAAAAAAAAAAxwFYAAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-13T11:07:12.816Z",
               "EditorCaption": ""

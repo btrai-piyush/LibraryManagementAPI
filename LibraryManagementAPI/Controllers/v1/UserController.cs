@@ -24,9 +24,9 @@ namespace LibraryManagementAPI.Controllers.v1
 
         [Authorize(Roles = "Librarian")]
         [HttpGet]
-        public async Task<ActionResult<List<UserResponseDto>>> GetAll()
+        public async Task<ActionResult<List<UserResponseDto>>> GetAllStudents(StudentQueryDto queryDto)
         {
-            var response = await _userService.GetAllUsersAsync();
+            var response = await _userService.GetAllStudentsAsync(queryDto);
             return Ok(response);
         }
 

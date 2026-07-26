@@ -10,7 +10,7 @@ namespace LibraryManagementClassLib.Services
 {
     public interface IUserService
     {
-        Task<List<UserResponseDto>> GetAllUsersAsync();
+        Task<List<UserResponseDto>> GetAllStudentsAsync(StudentQueryDto queryDto);
         Task<UserResponseDto> GetUserByIdAsync(int userId);
         Task<bool> DeleteAsync(int userId);
         Task<UserResponseDto> GetByEmailAsync(string email);

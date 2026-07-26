@@ -35,6 +35,9 @@ namespace LibraryManagementClassLib.Entities
         public string Phone { get; set; }
         public bool Status { get; set; }
 
+        [MaxLength(100, ErrorMessage = "FullName cannot exceed 100 characters")]
+        public string FullName { get; set; }
+
         public ICollection<BookIssue>? BookIssues { get; set; }
         public ICollection<BorrowRequest>? BookRequests { get; set; }
         public ICollection<RefreshToken>? RefreshTokens { get; set; }

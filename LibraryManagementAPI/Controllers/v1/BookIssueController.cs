@@ -76,12 +76,12 @@ namespace LibraryManagementAPI.Controllers.v1
             }
         }
 
-        [HttpPost("user")]
-        public async Task<IActionResult> GetBorrowedBooks(UserBookIssueQueryDto query)
+        [HttpPost("user/active")]
+        public async Task<IActionResult> GetActiveBookIssuesByUserId(GeneralQueryDto query)
         {
             try
             {
-                var result = await _bookIssueService.GetBookIssuesByUserIdAsync(query);
+                var result = await _bookIssueService.GetActiveBookIssuesByUserIdAsync(query);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -90,6 +90,46 @@ namespace LibraryManagementAPI.Controllers.v1
             }
         }
 
+        [HttpPost("user/history")]
+        public async Task<IActionResult> GetBookIssuesHistoryByUserId(GeneralQueryDto query)
+        {
+            try
+            {
+                var result = await _bookIssueService.GetBookIssuesHistoryByUserIdAsync(query);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
+        [HttpPost("admin/active")]
+        public async Task<IActionResult> AdminGetActiveIssues(GeneralQueryDto query)
+        {
+            try
+            {
+                var result = await _bookIssueService.AdminGetActiveIssues(query);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("admin/history")]
+        public async Task<IActionResult> AdminGetIssuesHistory(GeneralQueryDto query)
+        {
+            try
+            {
+                var result = await _bookIssueService.AdminGetIssuesHistory(query);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

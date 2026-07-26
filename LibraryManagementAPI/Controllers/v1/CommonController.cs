@@ -21,5 +21,12 @@ namespace LibraryManagementAPI.Controllers.v1
             var result = await _commonService.UserDashboard(userId);
             return Ok(result);
         }
+
+        [HttpGet("admin-dashboard")]
+        public async Task<IActionResult> AdminDashboard()
+        {
+            var result = await _commonService.AdminDashboard();
+            return Ok(result);
+        }
     }
 }

@@ -143,24 +143,6 @@ namespace LibraryManagementClassLib.Implementation
                 .Where(f => f.BookIssue.UserId == query.UserId)
                 .AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
-            {
-                var searchTerm = query.SearchTerm.ToLower();
-                finesQuery = finesQuery.Where(f => f.BookIssue.Book.Title.Contains(searchTerm)
-                                        || f.BookIssue.User.FirstName.Contains(searchTerm)
-                                        || f.BookIssue.User.LastName.Contains(searchTerm));
-            }
-
-            var queryCount = await finesQuery.CountAsync();
-
-            finesQuery = finesQuery.OrderByDescending(f => f.BookIssue.DueDate);
-
-            var pageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
-            var pageSize = query.PageSize <= 0 ? 10 : query.PageSize;
-            var skip = (pageNumber - 1) * pageSize;
-
-            finesQuery = finesQuery.Skip(skip).Take(pageSize);
-
             if (!string.IsNullOrEmpty(query.Status))
             {
                 if (query.Status.ToLower() == "paid")
@@ -173,6 +155,26 @@ namespace LibraryManagementClassLib.Implementation
                     finesQuery = finesQuery.Where(f => f.Status == PaidStatus.Unpaid);
                 }
             }
+
+            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
+            {
+                var searchTerm = query.SearchTerm.ToLower();
+                finesQuery = finesQuery.Where(f => f.BookIssue.Book.Title.Contains(searchTerm)
+                                        || f.BookIssue.User.FirstName.ToLower().Contains(searchTerm)
+                                        || f.BookIssue.User.LastName.ToLower().Contains(searchTerm)
+                                        || f.BookIssue.User.FullName.ToLower().Contains(searchTerm));
+            }
+
+            var queryCount = await finesQuery.CountAsync();
+
+            finesQuery = finesQuery.OrderByDescending(f => f.BookIssue.DueDate);
+
+            var pageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
+            var pageSize = query.PageSize <= 0 ? 10 : query.PageSize;
+            var skip = (pageNumber - 1) * pageSize;
+
+            finesQuery = finesQuery.Skip(skip).Take(pageSize);
+
 
             if (await finesQuery.CountAsync() == 0)
             {
@@ -239,6 +241,85 @@ namespace LibraryManagementClassLib.Implementation
             var overdueDays = dueDate < DateTime.Now ? (DateTime.Now - dueDate).Days : 0;
             var totalFine = overdueDays * finePerDay;
             return totalFine;
+        }
+
+        public async Task<List<FineDto>> AdminGetFines(UserFineQueryDto query)
+        {
+            var finesQuery = _context.Fines
+                .Include(f => f.BookIssue)
+                .ThenInclude(bi => bi.User)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(query.Status))
+            {
+                if (query.Status.ToLower() == "paid")
+                {
+                    finesQuery = finesQuery.Where(f => f.Status == PaidStatus.Paid);
+
+                }
+                else if (query.Status.ToLower() == "unpaid")
+                {
+                    finesQuery = finesQuery.Where(f => f.Status == PaidStatus.Unpaid);
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
+            {
+                var searchTerm = query.SearchTerm.ToLower();
+                finesQuery = finesQuery.Where(f => f.BookIssue.Book.Title.Contains(searchTerm)
+                                        || f.BookIssue.User.FirstName.ToLower().Contains(searchTerm)
+                                        || f.BookIssue.User.LastName.ToLower().Contains(searchTerm)
+                                        || f.BookIssue.User.FullName.ToLower().Contains(searchTerm));
+            }
+
+            var queryCount = await finesQuery.CountAsync();
+
+            finesQuery = finesQuery.OrderByDescending(f => f.BookIssue.DueDate);
+
+            var pageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
+            var pageSize = query.PageSize <= 0 ? 10 : query.PageSize;
+            var skip = (pageNumber - 1) * pageSize;
+
+            finesQuery = finesQuery.Skip(skip).Take(pageSize);
+
+
+            if (await finesQuery.CountAsync() == 0)
+            {
+                if (query.Status != null)
+                {
+                    throw new InvalidOperationException($"No {query.Status.ToLower()} fines found.");
+                }
+
+                throw new InvalidOperationException("No fines found for the specified user.");
+            }
+
+            var userFines = finesQuery.Select(f => new FineDto
+            {
+                Id = f.Id,
+                Amount = f.Amount,
+                Status = f.Status.ToString(),
+                PaidDate = f.PaidDate,
+                BookIssue = new BookIssuesDto
+                {
+                    Book = new BookDto
+                    {
+                        Id = f.BookIssue.Book.Id,
+                        Title = f.BookIssue.Book.Title,
+                        ISBN = f.BookIssue.Book.ISBN,
+                    },
+                    User = new UserDto
+                    {
+                        Id = f.BookIssue.User.Id,
+                        FirstName = f.BookIssue.User.FirstName,
+                        LastName = f.BookIssue.User.LastName,
+                        Email = f.BookIssue.User.Email
+                    },
+                    DueDate = f.BookIssue.DueDate
+                },
+                TotalCount = queryCount
+            }).ToList();
+
+            return userFines;
         }
     }
 }
