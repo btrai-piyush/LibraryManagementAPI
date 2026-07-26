@@ -33,10 +33,10 @@ namespace LibraryManagementAPI.Controllers.v1
             return Ok(requestedBooks);
         }
 
-        [HttpPost("get-all")]
-        public async Task<IActionResult> GetAllRequestedBooks(GeneralQueryDto query)
+        [HttpPost("user/pending-requests")]
+        public async Task<IActionResult> GetUserBookRequests(GeneralQueryDto query)
         {
-            var requestedBooks = await _bookRequestService.GetAllRequestedBooksAsync(query);
+            var requestedBooks = await _bookRequestService.GetUserBookRequestsAsync(query);
             return Ok(requestedBooks);
         }
 
@@ -66,6 +66,20 @@ namespace LibraryManagementAPI.Controllers.v1
         {
             var history = await _bookRequestService.GetBookRequestHistoryByUser(query);
             return Ok(history);
+        }
+
+        [HttpPost("admin/pending-requests")]
+        public async Task<IActionResult> AdminGetPendingRequests(GeneralQueryDto query)
+        {
+            var pendingRequests = await _bookRequestService.AdminGetPendingRequests(query);
+            return Ok(pendingRequests);
+        }
+
+        [HttpPost("admin/request-history")]
+        public async Task<IActionResult> AdminGetRequestHistory(GeneralQueryDto query)
+        {
+            var requestHistory = await _bookRequestService.AdminGetRequestHistory(query);
+            return Ok(requestHistory);
         }
     }
 }

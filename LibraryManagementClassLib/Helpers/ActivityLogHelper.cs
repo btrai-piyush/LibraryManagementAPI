@@ -9,7 +9,7 @@ namespace LibraryManagementClassLib.Helpers
 {
     public static class ActivityLogHelper
     {
-        public static ActivityLog CreateActivity(int userId, ActivityType activityType, string description, string? metaData = null, int? referenceId = null)
+        public static ActivityLog CreateActivity(int userId, ActivityType activityType, string description,string metaData)
         {
             return new ActivityLog
             {
@@ -17,7 +17,6 @@ namespace LibraryManagementClassLib.Helpers
                 ActivityType = activityType,
                 Description = description,
                 MetaData = metaData,
-                ReferenceId = referenceId,
                 CreatedAt = DateTime.UtcNow
             };
         }

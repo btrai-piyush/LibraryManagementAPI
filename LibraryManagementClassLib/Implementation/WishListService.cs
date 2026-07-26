@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Implementation
@@ -51,7 +52,11 @@ namespace LibraryManagementClassLib.Implementation
                 throw new Exception("Already added to wish list.");
             }
 
-            var activityLog = ActivityLogHelper.CreateActivity(request.UserId, ActivityType.BookWishlisted, $"Wishlisted \"{book.Title}\"", null, book.Id);
+            var activityMetadata = JsonSerializer.Serialize(new
+            {
+                BookTitle = book.Title
+            });
+            var activityLog = ActivityLogHelper.CreateActivity(request.UserId, ActivityType.BookWishlisted, $"Wishlisted \"{book.Title}\"", activityMetadata);
 
             _context.ActivityLogs.Add(activityLog);
             wishList.Books.Add(book);
@@ -94,7 +99,11 @@ namespace LibraryManagementClassLib.Implementation
             var book = wishList.Books.FirstOrDefault(b => b.Id == request.BookId);
             if (book == null) return "Book not found in wish list.";
 
-            var activityLog = ActivityLogHelper.CreateActivity(request.UserId, ActivityType.BookUnwishlisted, $"Removed \"{book.Title}\" from wish list", null, book.Id);
+            var activityMetadata = JsonSerializer.Serialize(new
+            {
+                BookTitle = book.Title
+            });
+            var activityLog = ActivityLogHelper.CreateActivity(request.UserId, ActivityType.BookUnwishlisted, $"Removed \"{book.Title}\" from wish list", activityMetadata);
             wishList.Books.Remove(book);
             await _context.SaveChangesAsync();
             return "Book removed from wish list successfully.";

@@ -27,7 +27,7 @@ namespace LibraryManagementClassLib.Entities
         public string Description { get; set; }
         public string? MetaData { get; set; }
         public DateTime CreatedAt { get; set; }
-        public int? ReferenceId { get; set; }
+        public int ReferenceId { get; set; }
 
         public User User { get; set; }
     }

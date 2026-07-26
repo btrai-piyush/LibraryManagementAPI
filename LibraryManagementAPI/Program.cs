@@ -15,6 +15,7 @@ string[] allowedOrigins =
     "http://localhost:5173",
     "https://patanlibrarymanager.vercel.app",
     "http://localhost:5185",
+    "http://apilibrarymanagement.runasp.net",
 };
 
 

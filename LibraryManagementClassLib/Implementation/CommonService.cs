@@ -19,9 +19,58 @@ namespace LibraryManagementClassLib.Implementation
         {
             _context = context;
         }
+
+        public async Task<AdminDashboardDto> AdminDashboard()
+        {
+            int totalBooks = await _context.Books.CountAsync();
+            int totalUsers = await _context.Users.CountAsync();
+            int activeBorrowings = await _context.BookIssues.CountAsync(bi => bi.ReturnDate == null);
+            int pendingRequests = await _context.BorrowRequests.CountAsync(br => br.Status == RequestStatus.Pending);
+            int unpaidFines = await _context.Fines.CountAsync(f => f.Status == Entities.PaidStatus.Unpaid);
+
+            var recentActivity = await _context.ActivityLogs
+                .Where(al => al.ActivityType == ActivityType.BookIssued
+                             || al.ActivityType==ActivityType.BookRequested
+                             || al.ActivityType == ActivityType.BookReturned
+                             || al.ActivityType == ActivityType.FinePaid
+                             || al.ActivityType == ActivityType.BookRequestCancelled
+                             || al.ActivityType == ActivityType.BookRequestRejected
+                             )
+                .OrderByDescending(al => al.CreatedAt)
+                .Take(5)
+                .Select(al => new ActivityLogDto
+                {
+                    UserId = al.UserId,
+                    ActivityType = al.ActivityType.ToString(),
+                    Description = al.Description,
+                    MetaData = al.MetaData,
+                    CreatedAt = al.CreatedAt,
+                    ReferenceId = al.ReferenceId
+                })
+                .ToListAsync();
+
+            var users= await _context.Users.Where(u => recentActivity.Select(ra => ra.UserId).Contains(u.Id)).ToListAsync();
+
+            foreach (var activity in recentActivity)
+            {
+                var activityUser = users.FirstOrDefault(u => u.Id == activity.UserId);
+                activity.Description = GetAdminActivityDescription(activity.ActivityType,activity.MetaData);
+            }
+
+            return new AdminDashboardDto
+            {
+                TotalBooks = totalBooks,
+                TotalUsers = totalUsers,
+                ActiveBorrowings = activeBorrowings,
+                PendingRequests = pendingRequests,
+                UnpaidFines = unpaidFines,
+                RecentActivity = recentActivity
+            };
+        }
+
         public async Task<UserDashboardDto> UserDashboard(int userId)
         {
-            int wishlistItems = await _context.WishLists.CountAsync(w => w.UserId == userId);
+            int wishlistItems = await _context.WishLists.Include(w => w.Books).Where(w => w.UserId == userId).SelectMany(w => w.Books).CountAsync();
             int requestedBooks = await _context.BorrowRequests.CountAsync(br => br.UserId == userId && br.Status == RequestStatus.Pending);
 
             var activeBookIssues = await _context.BookIssues.Include(bi => bi.Fine)
@@ -76,6 +125,28 @@ namespace LibraryManagementClassLib.Implementation
             };
 
             return response;
+        }
+
+        private string GetAdminActivityDescription(string activityType,string? metaData)
+        {
+            var serializedMetaData = string.IsNullOrEmpty(metaData) ? null : System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(metaData);
+            switch (activityType)
+            {
+                case "BookIssued":
+                    return $"\"{serializedMetaData?["BookTitle"]}\" issued to {serializedMetaData?["UserName"]}";
+                case "BookRequested":
+                    return $"\"{serializedMetaData?["BookTitle"]}\" requested by {serializedMetaData?["UserName"]}";
+                case "BookReturned":
+                   return $"\"{serializedMetaData?["BookTitle"]}\" returned by {serializedMetaData?["UserName"]}";
+                case "FinePaid":
+                    return $"\"{serializedMetaData?["UserName"] }\" paid रु {serializedMetaData?["FineAmount"]} fine.";
+                case "BookRequestCancelled":
+                    return $"Request for \"{serializedMetaData?["BookTitle"]}\" cancelled by {serializedMetaData?["UserName"]}";
+                case "BookRequestRejected":
+                    return $"Request for \"{serializedMetaData?["BookTitle"]}\" by {serializedMetaData?["UserName"]} rejected";
+                default:
+                    return $"No description available for activity type: {activityType}";
+            }
         }
     }
 }

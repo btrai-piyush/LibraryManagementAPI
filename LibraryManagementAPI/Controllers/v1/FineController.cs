@@ -62,5 +62,19 @@ namespace LibraryManagementAPI.Controllers.v1
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("admin-fines")]
+        public async Task<IActionResult> AdminGetFines(UserFineQueryDto query)
+        {
+            try
+            {
+                var fines = await _fineService.AdminGetFines(query);
+                return Ok(fines);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

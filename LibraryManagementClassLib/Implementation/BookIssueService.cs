@@ -101,86 +101,27 @@ namespace LibraryManagementClassLib.Implementation
             return "Book returned successfully.";
         }
 
-        public async Task<List<BookIssuesDto>> GetBookIssuesByUserIdAsync(UserBookIssueQueryDto query)
+        public async Task<List<BookIssuesDto>> GetActiveBookIssuesByUserIdAsync(GeneralQueryDto query)
         {
             var bookIssues = _context.BookIssues
                 .Include(bi => bi.Book)
                 .Include(bi => bi.User)
-                .Where(bi => bi.User.Id == query.UserId)
+                .Where(bi => bi.UserId == query.SearchId && (bi.Status == IssueStatus.Active || bi.Status == IssueStatus.Overdue))
                 .AsQueryable();
 
-            if(!string.IsNullOrEmpty(query.SearchTerm))
-            {
-                var searchTerm = query.SearchTerm.ToLower();
-                bookIssues = bookIssues.Where(bi =>
-                    bi.Book.Title.ToLower().Contains(searchTerm) ||
-                    bi.User.FirstName.ToLower().Contains(searchTerm) ||
-                    bi.User.LastName.ToLower().Contains(searchTerm));
-            }
+           var result = await CommonBookQueryFilter(query, bookIssues);
+            return result;
+        }
 
-            if (!string.IsNullOrEmpty(query.Status))
-            {
-                var status = query.Status.ToLower();
-
-                if (status != "returned")
-                {
-                    bookIssues = bookIssues.Where(bi => bi.Status != IssueStatus.Returned);
-                }
-                else
-                {
-                    if (Enum.TryParse<IssueStatus>(query.Status, true, out var issueStatus))
-                    {
-                        bookIssues = bookIssues.Where(bi => bi.Status == issueStatus);
-                    }
-                    else
-                    {
-                        throw new Exception("Invalid status value.");
-                    }
-                }
-            }
-            else
-            {
-                bookIssues = bookIssues.Where(bi => bi.Status != IssueStatus.Returned);
-            }
-
-            var queryCount = await bookIssues.CountAsync();
-
-            var pageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
-            var pageSize = query.PageSize <= 0 ? 10 : query.PageSize;
-            var skip = (pageNumber - 1) * pageSize;
-            bookIssues = bookIssues.Skip(skip).Take(pageSize);
-
-            var bookIssuesList = await bookIssues
-                .Select(bi => new BookIssuesDto
-                {
-                    BookIssueId = bi.Id,
-                    Book = new BookDto
-                    {
-                        Id = bi.Book.Id,
-                        Title = bi.Book.Title,
-                        Authors = bi.Book.Authors.Select(a => new AuthorDto
-                        {
-                            FirstName = a.FirstName,
-                            LastName = a.LastName
-                        }).ToList(),
-                        ISBN = bi.Book.ISBN,
-                        AvailableCopies = bi.Book.AvailableCopies,
-                        Publisher = bi.Book.Publisher.Name,
-                    },
-                    IssuedDate = bi.IssueDate,
-                    DueDate = bi.DueDate,
-                    ReturnedDate = bi.ReturnDate,
-                    Status = bi.Status.ToString(),
-                    TotalCount = queryCount
-                })
-                .ToListAsync();
-
-            if(bookIssuesList == null || !bookIssuesList.Any())
-            {
-                throw new Exception("No book issues found for this user.");
-            }
-
-            return bookIssuesList;
+        public async Task<List<BookIssuesDto>> GetBookIssuesHistoryByUserIdAsync(GeneralQueryDto query)
+        {
+            var bookIssues = _context.BookIssues
+                .Include(bi => bi.Book)
+                .Include(bi => bi.User)
+                .Where(bi => bi.UserId == query.SearchId && bi.Status == IssueStatus.Returned)
+                .AsQueryable();
+            var result = await CommonBookQueryFilter(query, bookIssues);
+            return result;
         }
 
         private async Task ValidateBorrowRequestAsync(int memberId, int bookId)
@@ -202,13 +143,59 @@ namespace LibraryManagementClassLib.Implementation
                 .Include(bi => bi.User)
                 .AsQueryable();
 
-            if(!string.IsNullOrEmpty(query.SearchTerm))
+            var result = await CommonBookQueryFilter(query, bookIssuesQuery);
+            return result;
+        }
+
+        public async  Task UpdateBookIssueStatus()
+        {
+            var bookIssues=await _context.BookIssues.Where(bi=>bi.Status==IssueStatus.Active).ToListAsync();
+            foreach (var bookIssue in bookIssues)
+            {
+                if(bookIssue.DueDate.Date < DateTime.Today)
+                {
+                    bookIssue.Status = IssueStatus.Overdue;
+                }
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        public Task<List<BookIssuesDto>> AdminGetActiveIssues(GeneralQueryDto query)
+        {
+            var bookIssuesQuery = _context.BookIssues
+                .Include(bi => bi.Book)
+                .Include(bi => bi.User)
+                .Where(bi => bi.ReturnDate == null)
+                .AsQueryable();
+
+            var result = CommonBookQueryFilter(query, bookIssuesQuery);
+
+            return result;
+        }
+
+        public Task<List<BookIssuesDto>> AdminGetIssuesHistory(GeneralQueryDto query)
+        {
+            var queryHistory = _context.BookIssues
+                .Include(bi => bi.Book)
+                .Include(bi => bi.User)
+                .Where(bi => bi.Status == IssueStatus.Returned)
+                .AsQueryable();
+
+            var result = CommonBookQueryFilter(query, queryHistory);
+
+            return result;
+        }
+
+        private async Task<List<BookIssuesDto>> CommonBookQueryFilter(GeneralQueryDto query,IQueryable<BookIssue> bookIssuesQuery)
+        {
+            if (!string.IsNullOrEmpty(query.SearchTerm))
             {
                 var searchTerm = query.SearchTerm.ToLower();
                 bookIssuesQuery = bookIssuesQuery.Where(bi =>
                     bi.Book.Title.ToLower().Contains(searchTerm) ||
                     bi.User.FirstName.ToLower().Contains(searchTerm) ||
-                    bi.User.LastName.ToLower().Contains(searchTerm));
+                    bi.User.LastName.ToLower().Contains(searchTerm) ||
+                    bi.User.FullName.ToLower().Contains(searchTerm));
             }
 
             var queryCount = await bookIssuesQuery.CountAsync();
@@ -251,19 +238,6 @@ namespace LibraryManagementClassLib.Implementation
                     TotalCount = queryCount
                 })
                 .ToListAsync();
-        }
-
-        public async  Task UpdateBookIssueStatus()
-        {
-            var bookIssues=await _context.BookIssues.Where(bi=>bi.Status==IssueStatus.Active).ToListAsync();
-            foreach (var bookIssue in bookIssues)
-            {
-                if(bookIssue.DueDate.Date < DateTime.Today)
-                {
-                    bookIssue.Status = IssueStatus.Overdue;
-                }
-            }
-            await _context.SaveChangesAsync();
         }
     }
 }

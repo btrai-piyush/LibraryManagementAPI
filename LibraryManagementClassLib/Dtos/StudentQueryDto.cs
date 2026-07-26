@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Dtos
 {
-    public class UserFineQueryDto
+    public class StudentQueryDto
     {
-        public int? UserId { get; set; }
-        public string? Status { get; set; } = null;
-        public string? SearchTerm { get; set; }
+        public string? SearchTerm { get; set; } = null;
+        public string? CourseCode { get; set; } = null;
+        public string? SortBy { get; set; } = null;
+        public bool IsDescending { get; set; } = false;
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 20;
     }

@@ -18,7 +18,7 @@ public class UserService : IUserService
     private readonly LibraryManagementAPIDbContext _context;
     private readonly IGenericRepository<User> _genericRepository;
 
-    public UserService(LibraryManagementAPIDbContext context,IGenericRepository<User> genericRepository) 
+    public UserService(LibraryManagementAPIDbContext context, IGenericRepository<User> genericRepository)
     {
         _context = context;
         _genericRepository = genericRepository;
@@ -29,24 +29,50 @@ public class UserService : IUserService
         throw new NotImplementedException();
     }
 
-    public async Task<List<UserResponseDto>> GetAllUsersAsync()
+    public async Task<List<UserResponseDto>> GetAllStudentsAsync(StudentQueryDto queryDto)
     {
-        var users = await _context.Users.ToListAsync();
-        List<UserResponseDto> userResponses = new List<UserResponseDto>();
-        foreach (var user in users)
+        var usersQuery = _context.Users
+            .Include(u => u.StudentDetail)
+            .ThenInclude(sd => sd.Course)
+            .Where(u => u.Role == Role.user)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(queryDto.CourseCode))
         {
-            userResponses.Add(new UserResponseDto
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                Role = user.Role.ToString(),
-                CreatedAt = user.CreatedAt,
-                Phone = user.Phone,
-                Status = user.Status
-            });
+            usersQuery = usersQuery.Where(u => u.StudentDetail != null && u.StudentDetail.Course.Code == queryDto.CourseCode);
         }
+
+        if (!string.IsNullOrEmpty(queryDto.SearchTerm))
+        {
+            usersQuery = usersQuery.Where(u => u.FullName.Contains(queryDto.SearchTerm));
+        }
+
+        var totalCount = await usersQuery.CountAsync();
+
+        var pageNumber = queryDto.PageNumber <= 0 ? 1 : queryDto.PageNumber;
+        var pageSize = queryDto.PageSize <= 0 ? 10 : queryDto.PageSize;
+
+        var skipNumber = (pageNumber - 1) * pageSize;
+        usersQuery = usersQuery.Skip(skipNumber).Take(pageSize);
+
+        var userResponses = await usersQuery.Select(user => new UserResponseDto
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            Role = user.Role.ToString(),
+            CreatedAt = user.CreatedAt,
+            Phone = user.Phone,
+            Status = user.Status,
+            StudentDetail = user.StudentDetail != null ? new StudentDetailDto
+            {
+                CourseName = user.StudentDetail.Course.Name,
+                Semester = user.StudentDetail.Semester
+            } : null,
+            TotalCount = totalCount
+        }).ToListAsync();
+
         return userResponses;
     }
 
