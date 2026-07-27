@@ -15,9 +15,11 @@ namespace LibraryManagementClassLib.Implementation
     {
         private readonly LibraryManagementAPIDbContext _context;
 
-        public CommonService(LibraryManagementAPIDbContext context)
+        private readonly IRecommendationService _recommendationService;
+        public CommonService(LibraryManagementAPIDbContext context, IRecommendationService recommendationService)
         {
             _context = context;
+            _recommendationService = recommendationService;
         }
 
         public async Task<AdminDashboardDto> AdminDashboard()
@@ -123,6 +125,9 @@ namespace LibraryManagementClassLib.Implementation
                     })
                     .ToListAsync()
             };
+
+            response.RecommendedBooks = await _recommendationService.GetUserRecommendations(userId);
+            response.RecommendedBooks = response.RecommendedBooks.Take(5).ToList();
 
             return response;
         }

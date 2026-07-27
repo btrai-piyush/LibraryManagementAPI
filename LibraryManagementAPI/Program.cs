@@ -67,6 +67,11 @@ builder.Services.AddScoped<IBookRequestService, BookRequestService>();
 builder.Services.AddScoped<IWishListService, WishListService>();
 builder.Services.AddScoped<IFineService, FineService>();
 builder.Services.AddScoped<ICommonService, CommonService>();
+builder.Services.AddScoped<ISubjectService, SubjectService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+
+builder.Services.AddHttpClient<IGoogleBooksService, GoogleBooksService>();
 
 builder.Services
     .AddAuthentication(options =>

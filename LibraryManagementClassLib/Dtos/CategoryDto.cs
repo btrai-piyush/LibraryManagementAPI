@@ -6,12 +6,8 @@ using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Dtos
 {
-    public class SubjectDto
+    public class CategoryDto
     {
-        public int Id { get; set; }
         public string Name { get; set; }
-        public string Code { get; set; }
-        public int CourseId { get; set; }
-        public string SemesterCode { get; set; }
     }
 }

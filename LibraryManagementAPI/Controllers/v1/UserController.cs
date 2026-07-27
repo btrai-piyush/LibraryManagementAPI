@@ -22,8 +22,8 @@ namespace LibraryManagementAPI.Controllers.v1
             _userService = userService;
         }
 
-        [Authorize(Roles = "Librarian")]
-        [HttpGet]
+        //[Authorize(Roles = "Librarian")]
+        [HttpPost("get-all")]
         public async Task<ActionResult<List<UserResponseDto>>> GetAllStudents(StudentQueryDto queryDto)
         {
             var response = await _userService.GetAllStudentsAsync(queryDto);
@@ -68,6 +68,26 @@ namespace LibraryManagementAPI.Controllers.v1
                     return Unauthorized("You are not authorized to access this resource.");
                 }
                 var response = await _userService.GetStudentDetails(studentId);
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                return NotFound(e.Message);
+            }
+        }
+
+        [HttpGet("admin-view")]
+        public async Task<IActionResult> GetAdminStudentView([FromQuery] int studentId)
+        {
+            try
+            {
+                //var userId = int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out int parsedUserId);
+                //var role = User.FindFirst(ClaimTypes.Role)?.Value.ToLower();
+                //if (role != "admin")
+                //{
+                //    return Unauthorized("You are not authorized to access this resource.");
+                //}
+                var response = await _userService.GetAdminStudentViewAsync(studentId);
                 return Ok(response);
             }
             catch (Exception e)

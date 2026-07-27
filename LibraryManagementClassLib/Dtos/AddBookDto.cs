@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Dtos
 {
-    public class BookDto
+    public class AddBookDto
     {
-        public int? Id { get; set; }
-        [Required(ErrorMessage = "Title is required.")]
         public string Title { get; set; }
 
         public List<AuthorDto> Authors { get; set; } = new List<AuthorDto>();
@@ -26,11 +24,7 @@ namespace LibraryManagementClassLib.Dtos
 
         [Required(ErrorMessage = "Publisher is required.")]
         public string Publisher { get; set; }
-
-        [Required(ErrorMessage = "Publisher address is required.")]
         public string? PublisherAddress { get; set; } = "";
-        public int? AvailableCopies { get; set; }
-        public int ResultCount { get; set; }
         public List<int> SubjectIds { get; set; } = new List<int>();
     }
 }

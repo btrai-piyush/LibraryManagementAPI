@@ -44,9 +44,9 @@ namespace LibraryManagementAPI.Controllers.v1
 
         [HttpGet("{id}")]
         //[Authorize]
-        public async Task<IActionResult> GetBookById(int id)
+        public async Task<IActionResult> AdminGetBookById(int id)
         {
-            var result = await _bookService.GetBookById(id);
+            var result = await _bookService.AdminGetBookById(id);
             return Ok(result);
         }
 
@@ -66,11 +66,19 @@ namespace LibraryManagementAPI.Controllers.v1
             return Ok(result);
         }
 
-        [HttpPost("bulk-add")]
+        //[HttpPost("bulk-add")]
+        ////[Authorize(Roles = "Librarian")]
+        //public async Task<IActionResult> BulkAddBooks(List<AddBookDto> books)
+        //{
+        //    var result = await _bookService.BulkAddBooksAsync(books);
+        //    return Ok(result);
+        //}
+
+        [HttpPost("add-books")]
         //[Authorize(Roles = "Librarian")]
-        public async Task<IActionResult> BulkAddBooks(List<BookDto> books)
+        public async Task<IActionResult> AddBooks(List<AddBookDto> books)
         {
-            var result = await _bookService.BulkAddBooksAsync(books);
+            var result = await _bookService.AddBooksAsync(books);
             return Ok(result);
         }
     }
