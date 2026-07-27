@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Dtos
 {
-    public class BookDto
+    public class AdminBookViewDto
     {
         public int? Id { get; set; }
         [Required(ErrorMessage = "Title is required.")]
@@ -31,6 +31,6 @@ namespace LibraryManagementClassLib.Dtos
         public string? PublisherAddress { get; set; } = "";
         public int? AvailableCopies { get; set; }
         public int ResultCount { get; set; }
-        public List<int> SubjectIds { get; set; } = new List<int>();
+        public List<SubjectDto> Subjects { get; set; } = new List<SubjectDto>();
     }
 }

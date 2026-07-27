@@ -144,4 +144,59 @@ public class UserService : IUserService
             }
         });
     }
+
+    public async Task<AdminStudentViewDto> GetAdminStudentViewAsync(int studentId)
+    {
+        var student = await GetStudentDetails(studentId);
+        
+        var bookIssues = await _context.BookIssues
+            .Where(bi => bi.UserId == studentId)
+            .Select(bi => new BookIssuesDto
+            {
+                BookIssueId = bi.Id,
+                Book = new BookDto
+                {
+                    Id = bi.Book.Id,
+                    Title = bi.Book.Title,
+                    ISBN = bi.Book.ISBN
+                },
+                Status = bi.Status.ToString(),
+                IssuedDate = bi.IssueDate,
+                DueDate = bi.DueDate,
+                ReturnedDate = bi.ReturnDate
+            })
+            .Take(5)
+            .ToListAsync();
+
+        var fines = await _context.Fines.Include(f => f.BookIssue)
+            .Where(f => f.BookIssue.UserId == studentId)
+            .Select(f => new FineDto
+            {
+                Id = f.Id,
+                Amount = f.Amount,
+                Status = f.Status.ToString(),
+                PaidDate = f.PaidDate,
+                BookIssue = new BookIssuesDto
+                {
+                    BookIssueId = f.BookIssue.Id,
+                    Book = new BookDto
+                    {
+                        Id = f.BookIssue.Book.Id,
+                        Title = f.BookIssue.Book.Title,
+                    },
+                    DueDate = f.BookIssue.DueDate
+                }
+            })
+            .Take(5)
+            .ToListAsync();
+
+        var response= new AdminStudentViewDto
+        {
+            User = student,
+            BookIssues = bookIssues,
+            Fines = fines
+        };
+
+        return response;
+    }
 }

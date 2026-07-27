@@ -3,12 +3,15 @@
 using LibraryManagementClassLib.Data;
 using LibraryManagementClassLib.Dtos;
 using LibraryManagementClassLib.Entities;
+using LibraryManagementClassLib.Helpers;
+using LibraryManagementClassLib.Migrations;
 using LibraryManagementClassLib.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Implementation
@@ -25,7 +28,9 @@ namespace LibraryManagementClassLib.Implementation
         }
         public async Task<string> IssueBookAsync(int requestId, DateTime dueDate)
         {
-            var borrowRequest = await _context.BorrowRequests.FindAsync(requestId);
+            var borrowRequest = await _context.BorrowRequests
+                .Include(br => br.Book)
+                .FirstOrDefaultAsync(br => br.Id == requestId);
             if (borrowRequest != null)
             {
                 try
@@ -35,6 +40,7 @@ namespace LibraryManagementClassLib.Implementation
                     await ValidateBorrowRequestAsync(borrowRequest.UserId, borrowRequest.BookId);
 
                     borrowRequest.Status = RequestStatus.Issued;
+                    borrowRequest.Book.AvailableCopies -= 1;
                     await _context.SaveChangesAsync();
 
                     var bookIssue = new BookIssue
@@ -46,6 +52,15 @@ namespace LibraryManagementClassLib.Implementation
                         Status = IssueStatus.Active
                     };
                     _context.BookIssues.Add(bookIssue);
+                    var activityMetadata = JsonSerializer.Serialize(new
+                    {
+                        BookTitle =    borrowRequest.Book.Title,
+                        UserName = $"{borrowRequest.User.FirstName} {borrowRequest.User.LastName}",
+                    });
+                    var activityLog = ActivityLogHelper.CreateActivity(borrowRequest.UserId, ActivityType.BookIssued, $"Request accepted for '{borrowRequest.Book.Title}'", activityMetadata);
+
+                    _context.ActivityLogs.Add(activityLog);
+
                     await _context.SaveChangesAsync();
 
                     await transaction.CommitAsync();
@@ -65,7 +80,7 @@ namespace LibraryManagementClassLib.Implementation
 
         public async Task<string> ReturnBookAsync(int issueId)
         {
-            var bookIssue = _context.BookIssues.Where(
+            var bookIssue = _context.BookIssues.Include(b => b.Book).Include(u => u.User).Where(
                 bi => bi.Id == issueId).FirstOrDefault();
             if (bookIssue == null)
             {
@@ -90,8 +105,19 @@ namespace LibraryManagementClassLib.Implementation
             book.AvailableCopies += 1;
             try
             {
+
                 _context.Books.Update(book);
                 _context.BookIssues.Update(bookIssue);
+
+                var activityMetadata = JsonSerializer.Serialize(new
+                {
+                    BookTitle = bookIssue.Book.Title,
+                    UserName = $"{bookIssue.User.FirstName} {bookIssue.User.LastName}",
+                });
+                var activityLog = ActivityLogHelper.CreateActivity(bookIssue.UserId, ActivityType.BookReturned, $"Returned book \"{bookIssue.Book.Title}\".", activityMetadata);
+
+                _context.ActivityLogs.Add(activityLog);
+
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
