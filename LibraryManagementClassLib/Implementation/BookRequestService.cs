@@ -24,6 +24,13 @@ namespace LibraryManagementClassLib.Implementation
 
         public async Task<string> RequestBookAsync(int userId, int bookId)
         {
+            var existingRequest = await _context.BorrowRequests.Where(br => br.UserId == userId && br.BookId == bookId && br.Status == RequestStatus.Pending).FirstOrDefaultAsync();
+            
+            if (existingRequest != null)
+            {
+                throw new Exception("Book already requested.");
+            }
+
             var borrowRequest = new BorrowRequest
             {
                 BookId = bookId,
@@ -138,6 +145,12 @@ namespace LibraryManagementClassLib.Implementation
                     }
                 }
             }
+            else
+            {
+                activityLog = ActivityLogHelper.CreateActivity(userId, ActivityType.BookUnwishlisted, $"Removed \"{borrowRequest.Book.Title}\" from wishlist", activityMetadata);
+                await _context.ActivityLogs.AddAsync(activityLog);
+                await _context.SaveChangesAsync();
+            }
 
             return "Book request undone successfully.";
         }
@@ -157,7 +170,7 @@ namespace LibraryManagementClassLib.Implementation
 
         public Task<string> RejectBookRequest(int requestId)
         {
-            var borrowRequest = _context.BorrowRequests.Include(br => br.Book).FirstOrDefault(br => br.Id == requestId);
+            var borrowRequest = _context.BorrowRequests.Include(br=>br.User).Include(br => br.Book).FirstOrDefault(br => br.Id == requestId);
             if (borrowRequest != null)
             {
                 borrowRequest.Status = RequestStatus.Rejected;
@@ -230,9 +243,28 @@ namespace LibraryManagementClassLib.Implementation
                     br.User.LastName.Contains(query.SearchTerm));
             }
 
+
+
+            if(!string.IsNullOrEmpty(query.SortBy)) {
+                switch(query.SortBy.ToLower())
+                {
+                    case "title":
+                        requestsQuery = query.IsDescending ? requestsQuery.OrderByDescending(br => br.Book.Title) : requestsQuery.OrderBy(br => br.Book.Title);
+                        break;
+                    case "status":
+                        requestsQuery = query.IsDescending ? requestsQuery.OrderByDescending(br => br.Status) : requestsQuery.OrderBy(br => br.Status);
+                        break;
+                    case "user":
+                        requestsQuery = query.IsDescending ? requestsQuery.OrderByDescending(br => br.User.FirstName) : requestsQuery.OrderBy(br => br.User.FirstName);
+                        break;
+                    case "requestdate":
+                        requestsQuery = query.IsDescending ? requestsQuery.OrderByDescending(br => br.RequestDate) : requestsQuery.OrderBy(br => br.RequestDate);
+                        break;
+                }
+            }
+
             var queryCount = await requestsQuery.CountAsync();
 
-            requestsQuery = requestsQuery.OrderByDescending(br => br.RequestDate);
             var pageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
             var pageSize = query.PageSize <= 0 ? 10 : query.PageSize;
             var skip = (pageNumber - 1) * pageSize;

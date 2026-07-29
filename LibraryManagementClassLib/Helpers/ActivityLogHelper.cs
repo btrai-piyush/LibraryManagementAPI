@@ -17,7 +17,7 @@ namespace LibraryManagementClassLib.Helpers
                 ActivityType = activityType,
                 Description = description,
                 MetaData = metaData,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.Now,
             };
         }
     }

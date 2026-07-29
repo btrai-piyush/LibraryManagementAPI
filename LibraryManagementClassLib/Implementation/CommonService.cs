@@ -32,7 +32,7 @@ namespace LibraryManagementClassLib.Implementation
 
             var recentActivity = await _context.ActivityLogs
                 .Where(al => al.ActivityType == ActivityType.BookIssued
-                             || al.ActivityType==ActivityType.BookRequested
+                             || al.ActivityType == ActivityType.BookRequested
                              || al.ActivityType == ActivityType.BookReturned
                              || al.ActivityType == ActivityType.FinePaid
                              || al.ActivityType == ActivityType.BookRequestCancelled
@@ -51,12 +51,12 @@ namespace LibraryManagementClassLib.Implementation
                 })
                 .ToListAsync();
 
-            var users= await _context.Users.Where(u => recentActivity.Select(ra => ra.UserId).Contains(u.Id)).ToListAsync();
+            var users = await _context.Users.Where(u => recentActivity.Select(ra => ra.UserId).Contains(u.Id)).ToListAsync();
 
             foreach (var activity in recentActivity)
             {
                 var activityUser = users.FirstOrDefault(u => u.Id == activity.UserId);
-                activity.Description = GetAdminActivityDescription(activity.ActivityType,activity.MetaData);
+                activity.Description = GetAdminActivityDescription(activity.ActivityType, activity.MetaData);
             }
 
             return new AdminDashboardDto
@@ -68,6 +68,44 @@ namespace LibraryManagementClassLib.Implementation
                 UnpaidFines = unpaidFines,
                 RecentActivity = recentActivity
             };
+        }
+
+        public async Task<string> UpdateBookStatusAndFines()
+        {
+            //var isUpdatedToday = await _context.Fines.AnyAsync(f => f.UpdatedAt.HasValue && f.UpdatedAt.Value.Date == DateTime.Today.Date);
+            var isUpdatedToday = false;
+
+            if (!isUpdatedToday)
+            {
+                var bookIssues = await _context.BookIssues.Include(bi => bi.Fine).Where(bi => bi.ReturnDate == null).ToListAsync();
+                foreach (var bookIssue in bookIssues)
+                {
+                    if (bookIssue.DueDate.Date < DateTime.Today.Date)
+                    {
+                        bookIssue.Status = IssueStatus.Overdue;
+                        var fineDays = (DateTime.Today.Date - bookIssue.DueDate.Date).Days - 1;
+                        if (bookIssue.Fine == null)
+                        {
+                            var fine = new Fine
+                            {
+                                BookIssueId = bookIssue.Id,
+                                Amount = 10 * fineDays,
+                                Status = Entities.PaidStatus.Unpaid,
+                                UpdatedAt = DateTime.Now
+                            };
+                            _context.Fines.Add(fine);
+                        }
+                        else
+                        {
+                            bookIssue.Fine.Amount = 10 * fineDays;
+                            bookIssue.Fine.UpdatedAt = DateTime.Now;
+                        }
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return "Book statuses and fines updated successfully.";
         }
 
         public async Task<UserDashboardDto> UserDashboard(int userId)
@@ -132,7 +170,7 @@ namespace LibraryManagementClassLib.Implementation
             return response;
         }
 
-        private string GetAdminActivityDescription(string activityType,string? metaData)
+        private string GetAdminActivityDescription(string activityType, string? metaData)
         {
             var serializedMetaData = string.IsNullOrEmpty(metaData) ? null : System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(metaData);
             switch (activityType)
@@ -142,9 +180,9 @@ namespace LibraryManagementClassLib.Implementation
                 case "BookRequested":
                     return $"\"{serializedMetaData?["BookTitle"]}\" requested by {serializedMetaData?["UserName"]}";
                 case "BookReturned":
-                   return $"\"{serializedMetaData?["BookTitle"]}\" returned by {serializedMetaData?["UserName"]}";
+                    return $"\"{serializedMetaData?["BookTitle"]}\" returned by {serializedMetaData?["UserName"]}";
                 case "FinePaid":
-                    return $"\"{serializedMetaData?["UserName"] }\" paid रु {serializedMetaData?["FineAmount"]} fine.";
+                    return $"\"{serializedMetaData?["UserName"]}\" paid रु {serializedMetaData?["FineAmount"]} fine.";
                 case "BookRequestCancelled":
                     return $"Request for \"{serializedMetaData?["BookTitle"]}\" cancelled by {serializedMetaData?["UserName"]}";
                 case "BookRequestRejected":

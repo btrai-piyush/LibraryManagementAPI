@@ -248,35 +248,26 @@ namespace LibraryManagementClassLib.Implementation
 
         private async Task<List<BookDto>> GetColdStartRecommendations(int userId)
         {
-            var studentInfo = await _context.Users
+            var courseId = await _context.Users
                 .Where(u => u.Id == userId)
-                .Select(u => new
-                {
-                    CourseCode = u.StudentDetail.Course.Code,   
-                    Semester = u.StudentDetail.Semester      
-                })
+                .Select(u => u.StudentDetail.Course.Id)
                 .FirstOrDefaultAsync();
 
-            if (studentInfo == null)
+            if (courseId == 0)
                 return new List<BookDto>();
 
-            string semesterCode = $"{studentInfo.CourseCode}{studentInfo.Semester}";
-
-            var semesterSubjectIds = await _context.Subjects
-                .Where(s => s.SemesterCode == semesterCode)
+            var courseSubjectIds = await _context.Subjects
+                .Where(s => s.CourseId == courseId)
                 .Select(s => s.Id)
                 .ToListAsync();
 
-            if (!semesterSubjectIds.Any())
-                return new List<BookDto>(); 
-
             var recommendedBooks = await _context.Books
                 .Include(b => b.Subjects)
-                .Where(b => b.Subjects.Any(s => semesterSubjectIds.Contains(s.Id)))
+                .Where(b => b.Subjects.Any(s => courseSubjectIds.Contains(s.Id)))
                 .Select(book => new
                 {
                     Book = book,
-                    MatchCount = book.Subjects.Count(s => semesterSubjectIds.Contains(s.Id))
+                    MatchCount = book.Subjects.Count(s => courseSubjectIds.Contains(s.Id))
                 })
                 .OrderByDescending(x => x.MatchCount)
                 .Select(x => x.Book)

@@ -30,6 +30,7 @@ namespace LibraryManagementClassLib.Implementation
         {
             var borrowRequest = await _context.BorrowRequests
                 .Include(br => br.Book)
+                .Include(br=>br.User)
                 .FirstOrDefaultAsync(br => br.Id == requestId);
             if (borrowRequest != null)
             {
@@ -40,7 +41,6 @@ namespace LibraryManagementClassLib.Implementation
                     await ValidateBorrowRequestAsync(borrowRequest.UserId, borrowRequest.BookId);
 
                     borrowRequest.Status = RequestStatus.Issued;
-                    borrowRequest.Book.AvailableCopies -= 1;
                     await _context.SaveChangesAsync();
 
                     var bookIssue = new BookIssue
@@ -226,7 +226,39 @@ namespace LibraryManagementClassLib.Implementation
 
             var queryCount = await bookIssuesQuery.CountAsync();
 
-            bookIssuesQuery = bookIssuesQuery.OrderBy(bi => bi.IssueDate);
+            if(!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                if (query.SortBy.Equals("issueddate", StringComparison.OrdinalIgnoreCase))
+                {
+                    bookIssuesQuery = query.IsDescending ? bookIssuesQuery.OrderByDescending(bi => bi.IssueDate) : bookIssuesQuery.OrderBy(bi => bi.IssueDate);
+                }
+                else if (query.SortBy.Equals("duedate", StringComparison.OrdinalIgnoreCase))
+                {
+                    bookIssuesQuery = query.IsDescending ? bookIssuesQuery.OrderByDescending(bi => bi.DueDate) : bookIssuesQuery.OrderBy(bi => bi.DueDate);
+                }
+                else if (query.SortBy.Equals("status", StringComparison.OrdinalIgnoreCase))
+                {
+                    bookIssuesQuery = query.IsDescending ? bookIssuesQuery.OrderByDescending(bi => bi.Status) : bookIssuesQuery.OrderBy(bi => bi.Status);
+                }
+                else if(query.SortBy.Equals("title", StringComparison.OrdinalIgnoreCase))
+                {
+                    bookIssuesQuery = query.IsDescending ? bookIssuesQuery.OrderByDescending(bi => bi.Book.Title) : bookIssuesQuery.OrderBy(bi => bi.Book.Title);
+                }
+                else if (query.SortBy.Equals("requestdate", StringComparison.OrdinalIgnoreCase))
+                {
+                    bookIssuesQuery = query.IsDescending ? bookIssuesQuery.OrderByDescending(bi => bi.ReturnDate) : bookIssuesQuery.OrderBy(bi => bi.ReturnDate);
+                }
+                else
+                {
+                    // Default sorting by IssueDate ascending
+                    bookIssuesQuery = bookIssuesQuery.OrderBy(bi => bi.IssueDate);
+                }
+            }
+            else
+            {
+                // Default sorting by IssueDate ascending
+                bookIssuesQuery = bookIssuesQuery.OrderBy(bi => bi.IssueDate);
+            }
 
             var pageNumber = query.PageNumber <= 0 ? 1 : query.PageNumber;
             var pageSize = query.PageSize <= 0 ? 10 : query.PageSize;

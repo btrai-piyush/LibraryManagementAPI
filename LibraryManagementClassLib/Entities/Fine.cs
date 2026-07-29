@@ -21,5 +21,6 @@ namespace LibraryManagementClassLib.Entities
         public PaidStatus Status { get; set; }
         public DateTime? PaidDate { get; set; }
         public BookIssue BookIssue { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }
