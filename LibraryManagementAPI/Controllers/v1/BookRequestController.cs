@@ -23,7 +23,14 @@ namespace LibraryManagementAPI.Controllers.v1
         [HttpPost]
         public async Task<IActionResult> CreateBookRequest(WishlistRequestDto request)
         {
-            return Ok(await _bookRequestService.RequestBookAsync(request.UserId, request.BookId));
+            try
+            {
+                return Ok(await _bookRequestService.RequestBookAsync(request.UserId, request.BookId));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]

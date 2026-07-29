@@ -10,6 +10,8 @@ namespace LibraryManagementClassLib.Dtos
     {
         public int? UserId { get; set; }
         public string? Status { get; set; } = null;
+        public string? SortBy { get; set; } = null;
+        public bool IsDescending { get; set; } = false;
         public string? SearchTerm { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 20;

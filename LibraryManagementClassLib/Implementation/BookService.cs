@@ -423,10 +423,6 @@ public class BookService : IBookService
             return "No books provided.";
         }
 
-        // --------------------------------------------------
-        // 1. Normalize input
-        // --------------------------------------------------
-
         foreach (var request in requests)
         {
             request.ISBN = request.ISBN.Trim();
@@ -450,9 +446,6 @@ public class BookService : IBookService
                 .ToList() ?? new();
         }
 
-        // --------------------------------------------------
-        // 2. Get all ISBNs from request
-        // --------------------------------------------------
 
         var isbnList = requests
             .Select(x => x.ISBN)
@@ -460,10 +453,6 @@ public class BookService : IBookService
             .Distinct()
             .ToList();
 
-
-        // --------------------------------------------------
-        // 3. Load existing books in ONE DB query
-        // --------------------------------------------------
 
         var existingBooks = await _context.Books
             .Where(b => isbnList.Contains(b.ISBN))
@@ -474,11 +463,6 @@ public class BookService : IBookService
                 b => b.ISBN,
                 StringComparer.OrdinalIgnoreCase);
 
-
-        // --------------------------------------------------
-        // 4. Collect all authors
-        // --------------------------------------------------
-
         var authorKeys = requests
             .SelectMany(x => x.Authors)
             .Select(a => new
@@ -488,13 +472,6 @@ public class BookService : IBookService
             })
             .Distinct()
             .ToList();
-
-
-        // --------------------------------------------------
-        // 5. Load existing authors
-        // --------------------------------------------------
-
-        // 5. Load only potentially matching authors
 
         var firstNames = authorKeys
             .Select(x => x.FirstName)
@@ -517,20 +494,10 @@ public class BookService : IBookService
                 a => $"{a.FirstName.Trim().ToLower()}|{a.LastName.Trim().ToLower()}",
                 StringComparer.OrdinalIgnoreCase);
 
-
-        // --------------------------------------------------
-        // 6. Collect categories
-        // --------------------------------------------------
-
         var categoryNames = requests
             .SelectMany(x => x.Categories)
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
-
-
-        // --------------------------------------------------
-        // 7. Load existing categories
-        // --------------------------------------------------
 
         var existingCategories = await _context.Categories
             .Where(c => categoryNames.Contains(c.Name))
@@ -541,21 +508,11 @@ public class BookService : IBookService
                 c => c.Name,
                 StringComparer.OrdinalIgnoreCase);
 
-
-        // --------------------------------------------------
-        // 8. Collect publishers
-        // --------------------------------------------------
-
         var publisherNames = requests
             .Select(x => x.Publisher)
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
-
-
-        // --------------------------------------------------
-        // 9. Load existing publishers
-        // --------------------------------------------------
 
         var existingPublishers = await _context.Publishers
             .Where(p => publisherNames.Contains(p.Name))
@@ -565,11 +522,6 @@ public class BookService : IBookService
             .ToDictionary(
                 p => p.Name,
                 StringComparer.OrdinalIgnoreCase);
-
-
-        // --------------------------------------------------
-        // 10. Load all subjects in ONE query
-        // --------------------------------------------------
 
         var subjectIds = requests
             .SelectMany(x => x.SubjectIds)
@@ -583,11 +535,6 @@ public class BookService : IBookService
         var subjectsById = subjects
             .ToDictionary(s => s.Id);
 
-
-        // --------------------------------------------------
-        // 11. Track newly created entities in memory
-        // --------------------------------------------------
-
         var newAuthors = new Dictionary<string, Author>(
             StringComparer.OrdinalIgnoreCase);
 
@@ -597,17 +544,8 @@ public class BookService : IBookService
         var newPublishers = new Dictionary<string, Publisher>(
             StringComparer.OrdinalIgnoreCase);
 
-
-        // --------------------------------------------------
-        // 12. Process books in memory
-        // --------------------------------------------------
-
         foreach (var request in requests)
         {
-            // ----------------------------------------------
-            // Existing book
-            // ----------------------------------------------
-
             if (existingBooksByIsbn.TryGetValue(
                     request.ISBN,
                     out var existingBook))
@@ -619,25 +557,13 @@ public class BookService : IBookService
                 continue;
             }
 
-
-            // ----------------------------------------------
-            // New book
-            // ----------------------------------------------
-
             var book = new Book
             {
                 Title = request.Title,
                 ISBN = request.ISBN,
                 TotalCopies = request.TotalCopies,
-
-                // Don't trust availableCopies from request
                 AvailableCopies = request.TotalCopies
             };
-
-
-            // ----------------------------------------------
-            // Authors
-            // ----------------------------------------------
 
             foreach (var requestAuthor in request.Authors)
             {
@@ -645,13 +571,10 @@ public class BookService : IBookService
                     $"{requestAuthor.FirstName.Trim().ToLower()}|" +
                     $"{requestAuthor.LastName.Trim().ToLower()}";
 
-
-                // Existing author
                 if (!authorsByKey.TryGetValue(
                         authorKey,
                         out var author))
                 {
-                    // Newly created author in this batch
                     if (!newAuthors.TryGetValue(
                             authorKey,
                             out author))
@@ -668,11 +591,6 @@ public class BookService : IBookService
 
                 book.Authors.Add(author);
             }
-
-
-            // ----------------------------------------------
-            // Categories
-            // ----------------------------------------------
 
             foreach (var categoryName in request.Categories)
             {
@@ -697,11 +615,6 @@ public class BookService : IBookService
 
                 book.Categories.Add(category);
             }
-
-
-            // ----------------------------------------------
-            // Publisher
-            // ----------------------------------------------
 
             if (!string.IsNullOrWhiteSpace(request.Publisher))
             {
@@ -728,11 +641,6 @@ public class BookService : IBookService
                 book.Publisher = publisher;
             }
 
-
-            // ----------------------------------------------
-            // Subjects
-            // ----------------------------------------------
-
             foreach (var subjectId in request.SubjectIds.Distinct())
             {
                 if (subjectsById.TryGetValue(
@@ -743,30 +651,14 @@ public class BookService : IBookService
                 }
             }
 
-
-            // ----------------------------------------------
-            // Add book
-            // ----------------------------------------------
-
             _context.Books.Add(book);
-
-            // Important:
-            // Add new book to dictionary so another request
-            // with same ISBN in this batch won't create
-            // another Book entity.
 
             existingBooksByIsbn.Add(
                 request.ISBN,
                 book);
         }
 
-
-        // --------------------------------------------------
-        // 13. ONE database save
-        // --------------------------------------------------
-
         await _context.SaveChangesAsync();
-
 
         return $"{requests.Count} books processed successfully.";
     }

@@ -15,6 +15,13 @@ namespace LibraryManagementAPI.Controllers.v1
             _commonService = commonService;
         }
 
+        [HttpGet("update-books")]
+        public async Task<IActionResult> UpdateBookStatusAndFines()
+        {
+            var result = await _commonService.UpdateBookStatusAndFines();
+            return Ok(result);
+        }
+
         [HttpGet("user-dashboard/{userId}")]
         public async Task<IActionResult> UserDashboard([FromRoute] int userId)
         {

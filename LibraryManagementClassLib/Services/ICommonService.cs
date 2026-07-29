@@ -11,5 +11,6 @@ namespace LibraryManagementClassLib.Services
     {
         Task<UserDashboardDto> UserDashboard(int userId);
         Task<AdminDashboardDto> AdminDashboard();
+        Task<string> UpdateBookStatusAndFines();
     }
 }

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace LibraryManagementClassLib.Implementation
@@ -248,30 +249,33 @@ namespace LibraryManagementClassLib.Implementation
 
         private async Task<List<BookDto>> GetColdStartRecommendations(int userId)
         {
-            var studentInfo = await _context.Users
+            var studentProfile = await _context.Users
+                .AsNoTracking()
                 .Where(u => u.Id == userId)
                 .Select(u => new
                 {
-                    CourseCode = u.StudentDetail.Course.Code,   
-                    Semester = u.StudentDetail.Semester      
+                    CourseId = u.StudentDetail != null ? (int?)u.StudentDetail.CourseId : null,
+                    Semester = u.StudentDetail != null ? (int?)u.StudentDetail.Semester : null
                 })
                 .FirstOrDefaultAsync();
 
-            if (studentInfo == null)
+            if (studentProfile?.CourseId == null || studentProfile.Semester == null)
                 return new List<BookDto>();
 
-            string semesterCode = $"{studentInfo.CourseCode}{studentInfo.Semester}";
-
             var semesterSubjectIds = await _context.Subjects
-                .Where(s => s.SemesterCode == semesterCode)
+                .AsNoTracking()
+                .Where(s => s.CourseId == studentProfile.CourseId.Value && MatchesSemesterCode(s.SemesterCode, studentProfile.Semester.Value))
                 .Select(s => s.Id)
                 .ToListAsync();
 
             if (!semesterSubjectIds.Any())
-                return new List<BookDto>(); 
+                return new List<BookDto>();
 
             var recommendedBooks = await _context.Books
+                .AsNoTracking()
+                .Include(b => b.Authors)
                 .Include(b => b.Subjects)
+                .Include(b => b.Publisher)
                 .Where(b => b.Subjects.Any(s => semesterSubjectIds.Contains(s.Id)))
                 .Select(book => new
                 {
@@ -279,11 +283,38 @@ namespace LibraryManagementClassLib.Implementation
                     MatchCount = book.Subjects.Count(s => semesterSubjectIds.Contains(s.Id))
                 })
                 .OrderByDescending(x => x.MatchCount)
+                .ThenBy(x => x.Book.Title)
                 .Select(x => x.Book)
                 .Take(10)
                 .ToListAsync();
 
             return MapBooks(recommendedBooks);
+        }
+
+        private static bool MatchesSemesterCode(string semesterCode, int semester)
+        {
+            if (string.IsNullOrWhiteSpace(semesterCode))
+                return false;
+
+            var normalizedCode = semesterCode.Trim().ToLowerInvariant();
+            var semesterText = semester.ToString();
+            var ordinalText = semester switch
+            {
+                1 => "first",
+                2 => "second",
+                3 => "third",
+                4 => "fourth",
+                5 => "fifth",
+                6 => "sixth",
+                7 => "seventh",
+                8 => "eighth",
+                _ => null
+            };
+
+            if (ordinalText != null && normalizedCode.Contains(ordinalText))
+                return true;
+
+            return Regex.IsMatch(normalizedCode, $@"(^|[^0-9]){Regex.Escape(semesterText)}([^0-9]|$)");
         }
 
         private List<BookDto> MapBooks(List<Book> books)

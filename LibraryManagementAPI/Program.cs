@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi;
-using Microsoft.AspNetCore.Authorization;
 using LibraryManagementClassLib.Repository.IRepository;
 using LibraryManagementClassLib.Repository;
 

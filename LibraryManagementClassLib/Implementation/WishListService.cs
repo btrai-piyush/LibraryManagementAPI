@@ -42,7 +42,10 @@ namespace LibraryManagementClassLib.Implementation
             var existingRequest = await _context.BorrowRequests
                 .FirstOrDefaultAsync(br => br.UserId == request.UserId && br.BookId == request.BookId && br.Status == RequestStatus.Pending);
 
-            if(existingRequest != null)
+            var existingBorrow = await _context.BookIssues
+                .FirstOrDefaultAsync(b => b.UserId == request.UserId && b.BookId == request.BookId && b.ReturnDate == null);
+
+            if (existingRequest != null)
             {
                 throw new Exception("Book already requested for borrowing.");
             }
@@ -50,6 +53,11 @@ namespace LibraryManagementClassLib.Implementation
             if (wishList.Books.Contains(book))
             {
                 throw new Exception("Already added to wish list.");
+            }
+
+            if(existingBorrow != null && existingBorrow.BookId == request.BookId && existingBorrow.UserId == request.UserId)
+            {
+                throw new Exception("Book already borrowed.");
             }
 
             var activityMetadata = JsonSerializer.Serialize(new
@@ -104,6 +112,7 @@ namespace LibraryManagementClassLib.Implementation
                 BookTitle = book.Title
             });
             var activityLog = ActivityLogHelper.CreateActivity(request.UserId, ActivityType.BookUnwishlisted, $"Removed \"{book.Title}\" from wish list", activityMetadata);
+            await _context.ActivityLogs.AddAsync(activityLog);
             wishList.Books.Remove(book);
             await _context.SaveChangesAsync();
             return "Book removed from wish list successfully.";

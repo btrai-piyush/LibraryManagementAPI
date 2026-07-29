@@ -39,12 +39,15 @@ public class AuthService : IAuthService
         {
             FirstName = request.FirstName,
             LastName = request.LastName,
+            FullName = request.FullName,
             Email = request.Email,
             Role = Role.user,
             CreatedAt = DateTime.Now,
             Phone = request.Phone,
             Status = true
         };
+
+
 
         var hashedPassword = new PasswordHasher<User>()
             .HashPassword(user, request.Password);
@@ -87,6 +90,9 @@ public class AuthService : IAuthService
             UserAgent = userAgent
         });
         await _context.SaveChangesAsync();
+
+        CommonService commonService = new CommonService(_context, null!);
+        await commonService.UpdateBookStatusAndFines();
 
         return new TokenResponseDto
         {
